@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
+  {% if user %}
+    <div class="mb-8 text-center">
+      <h2 class="text-2xl font-bold text-blue-800">Bienvenido, {{ user }} 👋</h2>
+      <p class="text-slate-600 mt-2">Esta es la página principal de Metasketch.</p>
+    </div>
+  {% endif %}
   <div class="space-y-8">
     <h2 class="text-2xl font-bold text-center text-blue-800 mb-8">Metasketch: un experimento VibeCoding</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

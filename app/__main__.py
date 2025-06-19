@@ -1,4 +1,5 @@
-"""Entry‑point & composition root."""
+"""Metasketch: un experimento VibeCoding
+Entry-point & composition root."""
 import os
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -20,10 +21,11 @@ async def on_startup() -> None:
 async def root(request: Request):
     user = request.cookies.get("user")
     if not user:
+        # Siempre redirige a login si no hay cookie
         return RedirectResponse("/login")
     return templates.TemplateResponse(
         "index.html",
-        {"request": request, "title": "Home", "user": user}
+        {"request": request, "title": "Metasketch: un experimento VibeCoding", "user": user}
     )
 
 app.include_router(api_router)

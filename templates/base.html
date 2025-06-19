@@ -3,21 +3,27 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>{{ title or "AI Web Template" }}</title>
+    <title>{{ title or "Metasketch" }}</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   </head>
-  <body class="bg-gradient-to-br from-slate-100 to-blue-100 min-h-screen flex items-center justify-center">
-    <div class="w-full max-w-xl bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
-      <header class="mb-6 text-center">
+  <body class="bg-gradient-to-br from-slate-100 to-blue-100 min-h-screen w-screen">
+    <div class="w-full h-screen flex flex-col">
+      <header class="mb-6 py-6 bg-white/80 shadow flex items-center justify-between px-8">
         <h1 class="text-3xl font-bold text-blue-700 drop-shadow-sm">
-          {{ title or "AI Web Template" }}
+          {{ title or "Metasketch" }}
         </h1>
+        {% if user %}
+        <div class="flex items-center space-x-4">
+          <span class="text-blue-800 font-semibold">Bienvenido, {{ user }} 👋</span>
+          <a href="/logout" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 transition">Logout</a>
+        </div>
+        {% endif %}
       </header>
-      <main>
+      <main class="flex-1 flex items-center justify-center">
         {% block content %}{% endblock %}
       </main>
     </div>

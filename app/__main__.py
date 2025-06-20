@@ -4,6 +4,7 @@ import os
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from app.api.router import router as api_router
 from app.db import init
 
@@ -29,6 +30,7 @@ async def root(request: Request):
     )
 
 app.include_router(api_router)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 if __name__ == "__main__":             # `python -m app.main`
     import uvicorn

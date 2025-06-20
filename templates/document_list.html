@@ -1,0 +1,13 @@
+{% if documents %}
+<ul class="divide-y divide-slate-200">
+  {% for doc in documents %}
+  <li class="py-2 flex flex-col">
+    <span class="font-semibold text-blue-800">{{ doc.file_name }}</span>
+    <span class="text-xs text-slate-500">{{ doc.categoria }} | {{ doc.fecha_carga }}</span>
+    <span class="text-xs text-slate-400">{{ doc.descripcion or '—' }}</span>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="text-slate-400">No hay documentos cargados.</p>
+{% endif %}

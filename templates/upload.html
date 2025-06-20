@@ -4,7 +4,15 @@
   <h2 class="text-xl font-bold text-blue-700 mb-4">Subir documento</h2>
   <form id="upload-form" hx-post="/api/document/upload" hx-encoding="multipart/form-data" hx-target="#upload-result" hx-swap="innerHTML" class="flex flex-col gap-4 w-full">
     <input type="file" name="file" required class="block w-full text-sm text-slate-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-    <input type="text" name="categoria" placeholder="Categoría" required class="rounded border px-3 py-2 text-slate-700" />
+    <select name="categoria" required class="rounded border px-3 py-2 text-slate-700 bg-white">
+      <option value="" disabled selected hidden>Selecciona una categoría</option>
+      <option value="Grafico">Gráfico</option>
+      <option value="RFP">RFP</option>
+      <option value="General">General</option>
+      <option value="Otros">Otros</option>
+      <option value="Funcional">Funcional</option>
+      <option value="Técnico">Técnico</option>
+    </select>
     <input type="text" name="descripcion" placeholder="Descripción breve" class="rounded border px-3 py-2 text-slate-700" />
     <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition">Upload documento</button>
   </form>

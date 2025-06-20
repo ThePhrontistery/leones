@@ -5,9 +5,15 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from app.services.document_service import save_uploaded_document
-from app.services.document_store import add_document, get_documents
+from app.services.document_store import get_documents, clear_documents_async
 from app.models.document import UploadedDocument
 from typing import Optional
+import asyncio
+from app.db.session import AsyncSessionLocal
+from app.db.models import UploadedFile
+from sqlalchemy.future import select
+from sqlalchemy import text
+import os
 
 router = APIRouter(prefix="/api/document", tags=["document"])
 templates = Jinja2Templates(directory="templates")
@@ -39,7 +45,6 @@ async def upload_document(
             descripcion=descripcion,
             proyecto=proyecto,
         )
-        add_document(doc)
         return templates.TemplateResponse(
             "upload_result.html",
             {"request": request, "doc": doc}
@@ -52,15 +57,25 @@ async def list_documents(request: Request):
     """
     Render the list of uploaded documents for the main panel.
     """
-    docs = get_documents()
+    docs = await get_documents()
     return templates.TemplateResponse("document_list.html", {"request": request, "documents": docs})
 
 @router.post("/clear", response_class=HTMLResponse)
 async def clear_documents(request: Request):
     """
-    Borra todos los documentos subidos (solo memoria, demo).
+    Borra todos los documentos subidos (en base de datos y en disco).
     """
-    from app.services.document_store import clear_documents
-    clear_documents()
-    docs = get_documents()
+    # Borrar archivos en disco
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(UploadedFile))
+        files = result.scalars().all()
+        for f in files:
+            try:
+                if os.path.exists(f.file_path):
+                    os.remove(f.file_path)
+            except Exception:
+                pass
+        await session.execute(text("DELETE FROM uploaded_files"))
+        await session.commit()
+    docs = await get_documents()
     return templates.TemplateResponse("document_list.html", {"request": request, "documents": docs})

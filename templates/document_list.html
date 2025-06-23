@@ -1,4 +1,19 @@
 {% if documents %}
+<div class="flex items-center justify-between mb-4">
+  <h2 class="text-lg font-bold text-slate-700">Documentos cargados</h2>
+  <button 
+    id="btn-generar-funcional"
+    hx-post="/api/document/generar-funcional"
+    hx-trigger="click"
+    hx-target="#panel-markdown"
+    hx-swap="innerHTML"
+    hx-vals="{}"
+    hx-on:afterRequest="htmx.ajax('POST', '/api/document/generar-indice', {target: '#arbol-contenidos', swap: 'innerHTML'})"
+    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+  >
+    Generar Funcional
+  </button>
+</div>
 <ul class="divide-y divide-slate-200">
   {% for doc in documents %}
   <li class="py-2 flex flex-col">
@@ -11,3 +26,4 @@
 {% else %}
 <p class="text-slate-400">No hay documentos cargados.</p>
 {% endif %}
+<div id="panel-funcional" class="mt-8" style="display:none;"></div>

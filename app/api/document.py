@@ -4,7 +4,7 @@ API routes for document upload and management.
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from app.services.document_service import save_uploaded_document
+from app.services.document_service import save_uploaded_document, generate_functional_document
 from app.services.document_store import get_documents, clear_documents_async
 from app.models.document import UploadedDocument
 from typing import Optional
@@ -14,9 +14,11 @@ from app.db.models import UploadedFile
 from sqlalchemy.future import select
 from sqlalchemy import text
 import os
+import logging
 
 router = APIRouter(prefix="/api/document", tags=["document"])
 templates = Jinja2Templates(directory="templates")
+logger = logging.getLogger(__name__)
 
 @router.get("/upload", response_class=HTMLResponse)
 async def upload_form(request: Request):
@@ -79,3 +81,41 @@ async def clear_documents(request: Request):
         await session.commit()
     docs = await get_documents()
     return templates.TemplateResponse("document_list.html", {"request": request, "documents": docs})
+
+@router.post("/generar-funcional", response_class=HTMLResponse)
+async def generar_funcional(request: Request):
+    """
+    Genera el documento funcional usando la plantilla y los documentos cargados, llamando a la IA.
+    Devuelve el documento generado, el índice de secciones y el prompt usado.
+    Si la petición es HTMX, devuelve un fragmento HTML para actualizar el frontend.
+    """
+    try:
+        doc_funcional, indice, prompt = await generate_functional_document()
+        if request.headers.get("hx-request") == "true":
+            return templates.TemplateResponse(
+                "funcional_result.html",
+                {
+                    "request": request,
+                    "documento": doc_funcional,
+                    "indice": indice,
+                    "prompt": prompt,
+                }
+            )
+        return {"documento": doc_funcional, "indice": indice, "prompt": prompt}
+    except Exception as e:
+        logger.exception("Error en /api/document/generar-funcional")
+        return HTMLResponse(f"<div class='text-red-600'>Error: {str(e)}</div>", status_code=500)
+
+@router.post("/generar-indice", response_class=HTMLResponse)
+async def generar_indice(request: Request):
+    """
+    Genera el índice del documento funcional generado (no solo la plantilla) y lo devuelve como fragmento HTML para el árbol de contenidos.
+    """
+    try:
+        _, indice, _ = await generate_functional_document()
+        return templates.TemplateResponse(
+            "arbol_contenidos.html",
+            {"request": request, "indice": indice}
+        )
+    except Exception as e:
+        return HTMLResponse(f"<div class='text-red-600'>Error: {str(e)}</div>", status_code=500)

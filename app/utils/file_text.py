@@ -8,7 +8,9 @@ import os
 async def extract_text_from_file(file_path: str) -> Optional[str]:
     """
     Extrae texto de archivos .txt, .md, .pdf, .docx. Ignora imágenes si no hay OCR disponible.
+    Devuelve errores detallados para depuración.
     """
+    import traceback
     ext = os.path.splitext(file_path)[1].lower()
     try:
         if ext in {".txt", ".md"}:
@@ -18,18 +20,20 @@ async def extract_text_from_file(file_path: str) -> Optional[str]:
             try:
                 import pdfplumber
             except ImportError:
-                return None
+                return "[ERROR] Falta pdfplumber para leer PDF."
             with pdfplumber.open(file_path) as pdf:
                 return "\n".join(page.extract_text() or "" for page in pdf.pages)
         elif ext == ".docx":
             try:
                 import docx
             except ImportError:
-                return None
-            doc = docx.Document(file_path)
-            return "\n".join([p.text for p in doc.paragraphs])
-        # No OCR ni pytesseract por defecto
+                return "[ERROR] Falta python-docx para leer DOCX."
+            try:
+                doc = docx.Document(file_path)
+                return "\n".join([p.text for p in doc.paragraphs])
+            except Exception as e:
+                return f"[ERROR] python-docx no pudo leer el archivo: {e}\n{traceback.format_exc()}"
         else:
-            return None
-    except Exception:
-        return None
+            return f"[ERROR] Formato no soportado: {ext}"
+    except Exception as e:
+        return f"[ERROR] Error inesperado: {e}\n{traceback.format_exc()}"

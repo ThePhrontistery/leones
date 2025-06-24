@@ -5,10 +5,10 @@
     <div class="font-semibold text-blue-700 mb-2">Markdown</div>
     <textarea id="markdown-input" class="w-full min-h-[200px] bg-slate-50 rounded p-2 text-slate-800 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-200" spellcheck="false">{{ resultado|default('', true)|e }}</textarea>
   </div>
-  <!-- Sección 2: Vista previa HTML -->
+  <!-- Sección 2: Vista previa duplicada -->
   <div>
     <div class="font-semibold text-blue-700 mb-2">Vista previa</div>
-    <div id="markdown-preview" class="prose prose-slate max-w-none bg-slate-50 rounded p-4 border border-slate-200"></div>
+    <textarea id="markdown-preview-duplicate" class="w-full min-h-[200px] bg-slate-50 rounded p-2 text-slate-800 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-200" spellcheck="false" readonly>{{ resultado|default('', true)|e }}</textarea>
   </div>
   <!-- Sección 3: Mostrar también la descripción, categoría y fecha de carga del documento actual si está disponible -->
   {% if doc %}
@@ -18,16 +18,3 @@
   </div>
   {% endif %}
 </div>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const textarea = document.getElementById('markdown-input');
-    const preview = document.getElementById('markdown-preview');
-    function renderPreview() {
-      const markdown = textarea.value.replace(/\r\n|\r|\n/g, "\n");
-      preview.innerHTML = marked.parse(markdown);
-    }
-    textarea.addEventListener('input', renderPreview);
-    renderPreview();
-  });
-</script>

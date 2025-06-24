@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block content %}
-<div class="w-full h-full flex flex-col justify-center items-center">
+<div class="w-full h-screen flex flex-col justify-center items-center p-0 m-0">
   <div
-    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-7xl h-[70vh]"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full h-full"
   >
     <!-- Panel de carga de documentos -->
     <section
@@ -76,7 +76,7 @@
         id="panel-markdown"
         class="flex-1 flex flex-col items-stretch justify-start text-slate-400"
       >
-        <!-- Aquí irá el editor Markdown y vista previa -->
+        {% include "funcional_result.html" %}
       </div>
     </section>
     <!-- Chat lateral con IA -->

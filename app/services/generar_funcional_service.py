@@ -27,8 +27,10 @@ async def generar_funcional_ia() -> str:
         # Usar solo el documento más reciente
         doc = max(documentos, key=lambda d: d.fecha_carga)
         texto = await extract_text_from_file(doc.file_path)
-        if not texto:
+        if not texto or (isinstance(texto, str) and texto.strip() == ""):
             return f"No se pudo extraer texto del documento: {doc.file_name}"
+        if isinstance(texto, str) and texto.strip().startswith("[ERROR]"):
+            return texto  # Devuelve el mensaje de error detallado
         prompt = (
             f"A continuación tienes el contenido del documento '{doc.file_name}'. "
             "Resume su información en un análisis funcional claro y estructurado.\n\n"

@@ -1,7 +1,7 @@
 """
 API routes for document upload and management.
 """
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request, Query
 from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from app.services.document_service import save_uploaded_document, generate_functional_document
@@ -16,6 +16,8 @@ from sqlalchemy import text
 import os
 import logging
 from app.utils.parse_template import parse_template_tree
+from app.utils.file_text import markdown_to_html
+import re
 
 router = APIRouter(prefix="/api/document", tags=["document"])
 templates = Jinja2Templates(directory="templates")
@@ -133,3 +135,28 @@ async def arbol_contenidos(request: Request):
         "arbol_contenidos.html",
         {"request": request, "indice": indice}
     )
+
+@router.get("/funcional", response_class=HTMLResponse)
+async def mostrar_funcional(request: Request, section: str = Query(None)):
+    """
+    Devuelve el documento funcional completo en HTML, resaltando la sección indicada (anchor) si se proporciona.
+    """
+    try:
+        doc_funcional, _, _ = await generate_functional_document()
+        # Convertir markdown a HTML y resaltar la sección
+        html = markdown_to_html(doc_funcional)
+        if section:
+            # Añadir clase Tailwind al heading correspondiente (h1 o h2 con id=section)
+            def resaltar_heading(match):
+                tag, id_, contenido = match.group(1), match.group(2), match.group(3)
+                if id_ == section:
+                    return f'<{tag} id="{id_}" class="bg-yellow-100 border-l-4 border-yellow-400 pl-2">{contenido}</{tag}>'
+                return match.group(0)
+            html = re.sub(r'<(h[12]) id="([a-z0-9_\-]+)">(.*?)</h[12]>', resaltar_heading, html, flags=re.DOTALL)
+        return templates.TemplateResponse(
+            "funcional_result.html",
+            {"request": request, "resultado": doc_funcional, "html": html, "section": section}
+        )
+    except Exception as e:
+        logger.exception("Error en /api/document/funcional")
+        return HTMLResponse(f"<div class='text-red-600'>Error: {str(e)}</div>", status_code=500)

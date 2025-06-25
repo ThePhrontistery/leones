@@ -38,12 +38,26 @@ async def generar_funcional_ia() -> str:
         plantilla_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Documents", "Plantilla_Funcional.md"))
         indice = parse_template_tree(plantilla_path)
         # Construir el esquema de secciones en markdown
+        import re
+        def safe_anchor(title: str) -> str:
+            anchor = title.lower()
+            anchor = re.sub(r'[áÁ]', 'a', anchor)
+            anchor = re.sub(r'[éÉ]', 'e', anchor)
+            anchor = re.sub(r'[íÍ]', 'i', anchor)
+            anchor = re.sub(r'[óÓ]', 'o', anchor)
+            anchor = re.sub(r'[úÚ]', 'u', anchor)
+            anchor = re.sub(r'[ñÑ]', 'n', anchor)
+            anchor = re.sub(r'[^a-z0-9_\- ]', '', anchor)
+            anchor = anchor.replace(' ', '_')
+            return anchor
         def secciones_markdown(arbol):
             md = ""
             for nodo in arbol:
-                md += f"# {nodo['title']}\n\n"
+                anchor = safe_anchor(nodo['title'])
+                md += f"# {nodo['title']} {{#{anchor}}}\n\n"
                 for hijo in nodo.get("children", []):
-                    md += f"## {hijo['title']}\n\n"
+                    child_anchor = safe_anchor(hijo['title'])
+                    md += f"## {hijo['title']} {{#{child_anchor}}}\n\n"
             return md
         esquema = secciones_markdown(indice)
         prompt = (

@@ -1,16 +1,15 @@
-{# Fragmento HTML para mostrar el documento funcional generado en el panel Markdown #}
-<div id="editor-markdown" class="w-full bg-white p-4 rounded shadow flex flex-col gap-6">
+<!-- Fragmento HTML para mostrar el documento funcional generado en el panel Markdown -->
+<div id="panel-funcional" class="w-full bg-white p-4 rounded shadow flex flex-col gap-6">
   <!-- Sección 1: Editor Markdown editable -->
   <div>
     <div class="font-semibold text-blue-700 mb-2">Markdown</div>
-    <textarea id="markdown-input" class="w-full min-h-[200px] max-h-[200px] bg-slate-50 rounded p-2 text-slate-800 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-200" spellcheck="false">{{ resultado|default('', true)|e }}</textarea>
+    <textarea id="markdown-input" class="w-full min-h-[200px] max-h-[200px] bg-slate-50 rounded p-2 text-slate-800 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-200" spellcheck="false">{{ resultado|default('', true) }}</textarea>
   </div>
   <!-- Sección 2: Vista previa renderizada como HTML, mismo tamaño y scroll -->
   <div>
     <div class="font-semibold text-blue-700 mb-2">Vista previa</div>
-    <div id="markdown-preview-duplicate" class="prose prose-slate w-full min-h-[200px] max-h-[200px] overflow-auto bg-slate-50 rounded p-2 border border-slate-200">{{ resultado|default('', true)|e }}</div>
+    <div id="markdown-preview" class="prose prose-slate w-full min-h-[200px] max-h-[200px] overflow-auto bg-slate-50 rounded p-2 border border-slate-200">{{ html|safe }}</div>
   </div>
-  <!-- Sección 3: Mostrar también la descripción, categoría y fecha de carga del documento actual si está disponible -->
   {% if doc %}
   <div class="mt-4 p-4 bg-slate-100 rounded border border-slate-200">
     <div class="text-xs text-slate-500 mb-1">{{ doc.categoria }} | {{ doc.fecha_carga }}</div>
@@ -18,16 +17,17 @@
   </div>
   {% endif %}
 </div>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const textarea = document.getElementById('markdown-input');
-    const preview = document.getElementById('markdown-preview-duplicate');
-    function renderPreview() {
-      const markdown = textarea.value.replace(/\r\n|\r|\n/g, "\n");
-      preview.innerHTML = marked.parse(markdown);
+  // Scroll automático a la sección resaltada si existe
+  document.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.id === 'panel-funcional') {
+      const section = "{{ section|default('') }}";
+      if (section) {
+        const el = document.getElementById(section);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
     }
-    textarea.addEventListener('input', renderPreview);
-    renderPreview();
   });
 </script>

@@ -1,12 +1,32 @@
-{# Fragmento HTML para el Árbol de Contenidos #}
+<!-- Árbol de Contenidos con enlaces HTMX para cargar el análisis funcional resaltando la sección -->
 <ul class="list-disc pl-4">
     {% for item in indice %}
+        {% set anchor = item.title|lower|replace(' ', '_')|replace('á','a')|replace('é','e')|replace('í','i')|replace('ó','o')|replace('ú','u')|replace('ñ','n')|replace('.','') %}
         <li class="py-1 font-semibold text-blue-900">
-            {{ item.title }}
+            <a 
+                href="#{{ anchor }}"
+                hx-get="/api/document/funcional?section={{ anchor }}"
+                hx-target="#panel-funcional"
+                hx-swap="innerHTML"
+                class="hover:underline hover:text-blue-600"
+            >
+                {{ item.title }}
+            </a>
             {% if item.children %}
                 <ul class="list-circle pl-6 text-blue-700 font-normal">
                     {% for child in item.children %}
-                        <li class="py-0.5">{{ child.title }}</li>
+                        {% set child_anchor = child.title|lower|replace(' ', '_')|replace('á','a')|replace('é','e')|replace('í','i')|replace('ó','o')|replace('ú','u')|replace('ñ','n')|replace('.','') %}
+                        <li class="py-0.5">
+                            <a 
+                                href="#{{ child_anchor }}"
+                                hx-get="/api/document/funcional?section={{ child_anchor }}"
+                                hx-target="#panel-funcional"
+                                hx-swap="innerHTML"
+                                class="hover:underline hover:text-blue-500"
+                            >
+                                {{ child.title }}
+                            </a>
+                        </li>
                     {% endfor %}
                 </ul>
             {% endif %}

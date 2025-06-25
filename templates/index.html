@@ -56,7 +56,7 @@
       </div>
     </section>
 
-    <!-- Árbol de contenidos -->
+    <!-- Árbol de contenidos (ahora en la segunda columna) -->
     <section
       class="bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col min-h-[400px] h-full"
     >
@@ -76,18 +76,22 @@
       </div>
     </section>
 
-    <!-- Análisis funcional: Editor Markdown -->
+    <!-- Análisis funcional: Editor Markdown y Vista previa (solo estas dos secciones) -->
     <section
       class="bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col min-h-[400px] h-full"
     >
       <h3 class="font-semibold text-xl text-blue-700 mb-4">
         Análisis funcional (Markdown)
       </h3>
-      <div
-        id="panel-markdown"
-        class="flex-1 flex flex-col items-stretch justify-start text-slate-400"
-      >
-        <!-- Vacío al inicio -->
+      <div id="panel-markdown" class="flex-1 flex flex-col gap-4">
+        <!-- Editor Markdown -->
+        <div id="markdown-editor" class="mb-4">
+          <!-- Aquí va el editor markdown -->
+        </div>
+        <!-- Vista previa -->
+        <div id="markdown-preview" class="bg-white rounded p-4 border border-slate-200 min-h-[150px]">
+          <!-- Aquí va la vista previa del markdown renderizado -->
+        </div>
       </div>
     </section>
 

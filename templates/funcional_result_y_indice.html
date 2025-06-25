@@ -1,7 +1,28 @@
-<!-- Fragmento combinado para panel markdown y árbol de contenidos -->
-<div id="panel-markdown" hx-swap-oob="true">
-  {% include "funcional_result.html" %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="w-full flex flex-row gap-4 px-4">
+  <!-- Columna 1: Espacio reservado o navegación futura -->
+  <div class="w-1/12"></div>
+
+  <!-- Columna 2: Árbol de contenidos -->
+  <aside class="w-3/12 bg-white/70 rounded-lg shadow p-4 h-fit">
+    <h2 class="text-lg font-bold mb-2 text-blue-700">Árbol de Contenidos</h2>
+    {% include "arbol_contenidos.html" %}
+  </aside>
+
+  <!-- Columna 3: Editor Markdown y Vista Previa -->
+  <section class="w-7/12 flex flex-col gap-6">
+    <!-- Editor Markdown -->
+    <div class="bg-white/80 rounded-lg shadow p-4">
+      <h2 class="text-lg font-bold mb-2 text-blue-700">Editor Markdown</h2>
+      <pre class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto">{{ resultado_md }}</pre>
+    </div>
+    <!-- Vista Previa -->
+    <div class="bg-white/80 rounded-lg shadow p-4">
+      <h2 class="text-lg font-bold mb-2 text-blue-700">Vista Previa</h2>
+      <div id="panel-funcional" class="prose max-w-none">{{ resultado_html | safe }}</div>
+    </div>
+  </section>
 </div>
-<div id="arbol-contenidos" hx-swap-oob="true">
-  {% include "arbol_contenidos.html" %}
-</div>
+{% endblock %}

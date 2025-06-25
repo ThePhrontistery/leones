@@ -8,7 +8,7 @@
   <!-- Sección 2: Vista previa renderizada como HTML, mismo tamaño y scroll -->
   <div>
     <div class="font-semibold text-blue-700 mb-2">Vista previa</div>
-    <div id="markdown-preview" class="prose prose-slate w-full min-h-[200px] max-h-[200px] overflow-auto bg-slate-50 rounded p-2 border border-slate-200">{{ html|safe }}</div>
+    <div id="markdown-preview" class="prose prose-slate w-full min-h-[200px] max-h-[200px] overflow-auto bg-slate-50 rounded p-2 border border-slate-200"></div>
   </div>
   {% if doc %}
   <div class="mt-4 p-4 bg-slate-100 rounded border border-slate-200">
@@ -17,10 +17,38 @@
   </div>
   {% endif %}
 </div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
-  // Scroll automático a la sección resaltada si existe
-  document.addEventListener('htmx:afterSwap', function(evt) {
-    if (evt.detail.target.id === 'panel-funcional') {
+  function preprocessAnchors(md) {
+    // Convierte '# Título {#anchor}' en '# Título <span data-anchor="anchor"></span>'
+    return md.replace(/^(#+)\s+(.+?)\s*\{#([a-zA-Z0-9_\-]+)\}$/gm, function(_, hashes, title, anchor) {
+      return `${hashes} ${title} <span data-anchor="${anchor}"></span>`;
+    });
+  }
+  function postprocessAnchors(html) {
+    // Convierte <h1>Texto <span data-anchor="id"></span></h1> en <h1 id="id">Texto</h1>
+    return html.replace(/<(h[1-6])>([^<]+?) <span data-anchor="([a-zA-Z0-9_\-]+)"><\/span><\/h[1-6]>/g, function(_, tag, text, id) {
+      return `<${tag} id="${id}">${text}</${tag}>`;
+    });
+  }
+  function renderPreview() {
+    const textarea = document.getElementById('markdown-input');
+    const preview = document.getElementById('markdown-preview');
+    if (textarea && preview) {
+      let md = textarea.value;
+      md = preprocessAnchors(md);
+      let html = window.marked ? marked.parse(md) : md;
+      html = postprocessAnchors(html);
+      preview.innerHTML = html;
+    }
+  }
+  document.addEventListener('DOMContentLoaded', renderPreview);
+  document.getElementById('markdown-input')?.addEventListener('input', renderPreview);
+  // Renderizar también tras HTMX swap
+  document.body.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail && evt.detail.target && evt.detail.target.id === 'panel-funcional') {
+      renderPreview();
+      // Scroll automático a la sección resaltada si existe
       const section = "{{ section|default('') }}";
       if (section) {
         const el = document.getElementById(section);

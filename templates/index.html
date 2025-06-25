@@ -36,10 +36,14 @@
             hx-post="/api/generar-funcional/"
             hx-target="#panel-markdown"
             hx-swap="innerHTML"
+            hx-indicator="#generar-funcional-indicador"
             class="bg-green-700 text-white px-2 py-1 text-xs rounded hover:bg-green-800 transition"
           >
             Generar Funcional
           </button>
+          <div id="generar-funcional-indicador" class="flex items-center ml-2">
+            <!-- Aquí se mostrará el estado: generando..., ok, error -->
+          </div>
         </div>
         <div id="upload-result" class="mt-2"></div>
         <div

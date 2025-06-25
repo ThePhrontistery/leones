@@ -1,32 +1,112 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="w-full flex flex-row gap-4 px-4 pt-2 pb-4" style="height:calc(100vh - 5rem);">
-  <!-- Columna 1: Espacio reservado o navegación futura -->
-  <div class="w-1/12 h-full"></div>
-
+<div class="w-full h-full flex flex-row gap-2 px-2 pt-0 pb-0 min-h-0 overflow-hidden" style="height:100vh;">
   <!-- Columna 2: Árbol de contenidos -->
-  <aside class="w-3/12 bg-white/70 rounded-lg shadow p-4 h-full flex flex-col min-h-0 mt-0">
+  <aside class="w-1/5 bg-white/70 rounded-lg shadow p-4 h-full flex flex-col min-h-0 mt-0">
     <h2 class="text-base font-bold mb-2 text-blue-700 mt-0">Árbol de Contenidos</h2>
-    <div class="flex-1 overflow-y-auto min-h-0 mt-0">{% include "arbol_contenidos.html" %}</div>
+    <div class="flex-1 min-h-0"><div class="h-full overflow-y-auto">{% include "arbol_contenidos.html" %}</div></div>
   </aside>
 
   <!-- Columna 3: Análisis funcional (Editor + Vista Previa lado a lado) -->
-  <section class="w-7/12 flex flex-row gap-6 min-h-0 mt-0 h-full">
+  <section class="w-4/5 flex flex-row gap-4 min-h-0 mt-0 h-full">
     <!-- Editor Markdown -->
     <div class="w-1/2 bg-white/80 rounded-lg shadow p-4 flex flex-col h-full min-h-0 mt-0">
-      <h2 class="text-base font-bold mb-2 text-blue-700 mt-0">Editor Markdown</h2>
-      <pre class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto overflow-y-auto flex-1 h-full min-h-0 mt-0" id="markdown-editor-content">{{ resultado_md }}</pre>
+      <div class="flex flex-row items-center justify-between mb-2 gap-2">
+        <h2 class="text-base font-bold text-blue-700 mt-0 mb-0">Editor Markdown</h2>
+        <div class="flex flex-row gap-2 items-center">
+          <button id="guardar-markdown-btn" class="bg-blue-600 text-white px-2 py-1 text-xs rounded hover:bg-blue-700 transition">Guardar cambios</button>
+          <button id="exportar-markdown-btn" class="bg-green-600 text-white px-2 py-1 text-xs rounded hover:bg-green-700 transition">Exportar</button>
+          <select id="exportar-formato" class="px-1 py-1 rounded border border-slate-300 text-[10px] w-14 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <option value="word">Word</option>
+            <option value="pdf" disabled>PDF (próximamente)</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex-1 min-h-0">
+        <textarea class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto overflow-y-auto h-full min-h-0 w-full resize-none focus:outline-none focus:ring-2 focus:ring-blue-400" id="markdown-editor-content" name="markdown-editor-content" spellcheck="false">{{ resultado_md }}</textarea>
+      </div>
+      <div id="guardar-msg" class="mt-2 text-sm"></div>
     </div>
     <!-- Vista Previa -->
     <div class="w-1/2 bg-white/80 rounded-lg shadow p-4 flex flex-col h-full min-h-0 mt-0">
-      <h2 class="text-base font-bold mb-2 text-blue-700 mt-0">Vista Previa</h2>
-      <div id="panel-funcional" class="prose max-w-none overflow-y-auto flex-1 h-full min-h-0 mt-0">{{ resultado_html | safe }}</div>
+      <div class="flex flex-row items-center justify-center mb-2 gap-2">
+        <h2 class="text-base font-bold text-blue-700 mt-0 mb-0">Vista Previa</h2>
+      </div>
+      <div class="flex-1 min-h-0"><div id="panel-funcional" class="prose max-w-none overflow-y-auto h-full min-h-0 mt-0 text-xs">{{ resultado_html | safe }}</div></div>
     </div>
   </section>
 </div>
 {% endblock %}
 
 {% block scripts %}
-<!-- Sin scripts de sincronización ni scroll extra -->
+<script>
+document.body.classList.add('overflow-hidden', 'h-full');
+
+const guardarBtn = document.getElementById('guardar-markdown-btn');
+const exportarBtn = document.getElementById('exportar-markdown-btn');
+const exportarFormato = document.getElementById('exportar-formato');
+const textarea = document.getElementById('markdown-editor-content');
+const msgDiv = document.getElementById('guardar-msg');
+if (guardarBtn && textarea) {
+  guardarBtn.addEventListener('click', async () => {
+    guardarBtn.disabled = true;
+    msgDiv.textContent = 'Guardando...';
+    try {
+      const res = await fetch('/api/generar-funcional/guardar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ markdown_content: textarea.value })
+      });
+      const data = await res.json();
+      if (data.success) {
+        msgDiv.textContent = data.message;
+        msgDiv.className = 'mt-2 text-green-600 text-sm';
+      } else {
+        msgDiv.textContent = data.message || 'Error al guardar.';
+        msgDiv.className = 'mt-2 text-red-600 text-sm';
+      }
+    } catch (e) {
+      msgDiv.textContent = 'Error de red al guardar.';
+      msgDiv.className = 'mt-2 text-red-600 text-sm';
+    } finally {
+      guardarBtn.disabled = false;
+    }
+  });
+}
+if (exportarBtn && exportarFormato && textarea) {
+  exportarBtn.addEventListener('click', async () => {
+    exportarBtn.disabled = true;
+    msgDiv.textContent = 'Exportando...';
+    try {
+      const res = await fetch('/api/generar-funcional/exportar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ markdown_content: textarea.value, formato: exportarFormato.value })
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = exportarFormato.value === 'pdf' ? 'funcional.pdf' : 'funcional.docx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        msgDiv.textContent = 'Exportación completada.';
+        msgDiv.className = 'mt-2 text-green-600 text-sm';
+      } else {
+        msgDiv.textContent = 'Error al exportar.';
+        msgDiv.className = 'mt-2 text-red-600 text-sm';
+      }
+    } catch (e) {
+      msgDiv.textContent = 'Error de red al exportar.';
+      msgDiv.className = 'mt-2 text-red-600 text-sm';
+    } finally {
+      exportarBtn.disabled = false;
+    }
+  });
+}
+</script>
 {% endblock %}

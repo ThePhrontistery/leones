@@ -61,10 +61,6 @@
       <div
         id="panel-tree"
         class="flex-1 flex items-start justify-start text-slate-400"
-        hx-get="/api/document/arbol-contenidos"
-        hx-trigger="load"
-        hx-target="#arbol-contenidos"
-        hx-swap="innerHTML"
       >
         <div id="arbol-contenidos"></div>
       </div>
@@ -80,7 +76,7 @@
         id="panel-markdown"
         class="flex-1 flex flex-col items-stretch justify-start text-slate-400"
       >
-        {% include "funcional_result.html" %}
+        <!-- Vacío al inicio -->
       </div>
     </section>
     <!-- Chat lateral con IA -->
@@ -92,6 +88,7 @@
         id="panel-chat"
         class="flex-1 flex flex-col items-center justify-center text-slate-400"
       >
+        <!-- Vacío al inicio -->
         <button
           type="button"
           hx-post="/api/chat/saludo"

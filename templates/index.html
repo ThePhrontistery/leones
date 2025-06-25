@@ -55,6 +55,7 @@
         ></div>
       </div>
     </section>
+
     <!-- Árbol de contenidos -->
     <section
       class="bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col min-h-[400px] h-full"
@@ -66,9 +67,15 @@
         id="panel-tree"
         class="flex-1 flex items-start justify-start text-slate-400"
       >
-        <div id="arbol-contenidos"></div>
+        <div
+          id="arbol-contenidos"
+          hx-get="/api/document/arbol-contenidos"
+          hx-trigger="load"
+          hx-swap="innerHTML"
+        ></div>
       </div>
     </section>
+
     <!-- Análisis funcional: Editor Markdown -->
     <section
       class="bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col min-h-[400px] h-full"
@@ -83,6 +90,7 @@
         <!-- Vacío al inicio -->
       </div>
     </section>
+
     <!-- Chat lateral con IA -->
     <section
       class="bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col min-h-[400px] h-full"

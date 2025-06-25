@@ -1,27 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="w-full flex flex-row gap-4 px-4">
+<div class="w-full flex flex-row gap-4 px-4 pt-2 pb-4" style="height:calc(100vh - 5rem);">
   <!-- Columna 1: Espacio reservado o navegación futura -->
-  <div class="w-1/12"></div>
+  <div class="w-1/12 h-full"></div>
 
   <!-- Columna 2: Árbol de contenidos -->
-  <aside class="w-3/12 bg-white/70 rounded-lg shadow p-4 h-fit">
-    <h2 class="text-lg font-bold mb-2 text-blue-700">Árbol de Contenidos</h2>
-    {% include "arbol_contenidos.html" %}
+  <aside class="w-3/12 bg-white/70 rounded-lg shadow p-4 h-full flex flex-col min-h-0 mt-0">
+    <h2 class="text-base font-bold mb-2 text-blue-700 mt-0">Árbol de Contenidos</h2>
+    <div class="flex-1 overflow-y-auto min-h-0 mt-0">{% include "arbol_contenidos.html" %}</div>
   </aside>
 
   <!-- Columna 3: Análisis funcional (Editor + Vista Previa lado a lado) -->
-  <section class="w-7/12 flex flex-row gap-6">
+  <section class="w-7/12 flex flex-row gap-6 min-h-0 mt-0 h-full">
     <!-- Editor Markdown -->
-    <div class="w-1/2 bg-white/80 rounded-lg shadow p-4 flex flex-col">
-      <h2 class="text-lg font-bold mb-2 text-blue-700">Editor Markdown</h2>
-      <pre class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto overflow-y-auto max-h-96 flex-1" id="markdown-editor-content">{{ resultado_md }}</pre>
+    <div class="w-1/2 bg-white/80 rounded-lg shadow p-4 flex flex-col h-full min-h-0 mt-0">
+      <h2 class="text-base font-bold mb-2 text-blue-700 mt-0">Editor Markdown</h2>
+      <pre class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto overflow-y-auto flex-1 h-full min-h-0 mt-0" id="markdown-editor-content">{{ resultado_md }}</pre>
     </div>
     <!-- Vista Previa -->
-    <div class="w-1/2 bg-white/80 rounded-lg shadow p-4 flex flex-col">
-      <h2 class="text-lg font-bold mb-2 text-blue-700">Vista Previa</h2>
-      <div id="panel-funcional" class="prose max-w-none overflow-y-auto max-h-96 flex-1">{{ resultado_html | safe }}</div>
+    <div class="w-1/2 bg-white/80 rounded-lg shadow p-4 flex flex-col h-full min-h-0 mt-0">
+      <h2 class="text-base font-bold mb-2 text-blue-700 mt-0">Vista Previa</h2>
+      <div id="panel-funcional" class="prose max-w-none overflow-y-auto flex-1 h-full min-h-0 mt-0">{{ resultado_html | safe }}</div>
     </div>
   </section>
 </div>

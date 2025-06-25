@@ -15,6 +15,7 @@ from sqlalchemy.future import select
 from sqlalchemy import text
 import os
 import logging
+from app.utils.parse_template import parse_template_tree
 
 router = APIRouter(prefix="/api/document", tags=["document"])
 templates = Jinja2Templates(directory="templates")
@@ -119,3 +120,16 @@ async def generar_indice(request: Request):
         )
     except Exception as e:
         return HTMLResponse(f"<div class='text-red-600'>Error: {str(e)}</div>", status_code=500)
+
+@router.get("/arbol-contenidos", response_class=HTMLResponse)
+async def arbol_contenidos(request: Request):
+    """
+    Muestra el árbol de contenidos de la plantilla funcional en formato HTML (panel lateral).
+    """
+    plantilla_path = os.path.join(os.path.dirname(__file__), "..", "Documents", "Plantilla_Funcional.md")
+    plantilla_path = os.path.abspath(plantilla_path)
+    indice = parse_template_tree(plantilla_path)
+    return templates.TemplateResponse(
+        "arbol_contenidos.html",
+        {"request": request, "indice": indice}
+    )

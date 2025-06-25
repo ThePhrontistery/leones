@@ -61,6 +61,10 @@
       <div
         id="panel-tree"
         class="flex-1 flex items-start justify-start text-slate-400"
+        hx-get="/api/document/arbol-contenidos"
+        hx-trigger="load"
+        hx-target="#arbol-contenidos"
+        hx-swap="innerHTML"
       >
         <div id="arbol-contenidos"></div>
       </div>

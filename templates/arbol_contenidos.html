@@ -1,6 +1,15 @@
 {# Fragmento HTML para el Árbol de Contenidos #}
 <ul class="list-disc pl-4">
     {% for item in indice %}
-        <li class="py-1">{{ item }}</li>
+        <li class="py-1 font-semibold text-blue-900">
+            {{ item.title }}
+            {% if item.children %}
+                <ul class="list-circle pl-6 text-blue-700 font-normal">
+                    {% for child in item.children %}
+                        <li class="py-0.5">{{ child.title }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </li>
     {% endfor %}
 </ul>

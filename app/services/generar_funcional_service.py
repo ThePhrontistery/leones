@@ -8,6 +8,7 @@ from typing import Any
 import asyncio
 from app.services.document_store import get_documents
 from app.utils.file_text import extract_text_from_file
+from app.utils.parse_template import parse_template_tree
 
 load_dotenv()
 
@@ -17,7 +18,8 @@ AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
 async def generar_funcional_ia() -> str:
     """
-    Llama a Azure OpenAI para generar el resumen funcional del documento más reciente cargado.
+    Llama a Azure OpenAI para generar el resumen funcional del documento más reciente cargado,
+    siguiendo la estructura de la plantilla funcional (índice).
     Devuelve texto plano. Si ocurre un error, devuelve el mensaje de error.
     """
     try:
@@ -31,10 +33,24 @@ async def generar_funcional_ia() -> str:
             return f"No se pudo extraer texto del documento: {doc.file_name}"
         if isinstance(texto, str) and texto.strip().startswith("[ERROR]"):
             return texto  # Devuelve el mensaje de error detallado
+        # Obtener el índice de la plantilla funcional
+        import os
+        plantilla_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Documents", "Plantilla_Funcional.md"))
+        indice = parse_template_tree(plantilla_path)
+        # Construir el esquema de secciones en markdown
+        def secciones_markdown(arbol):
+            md = ""
+            for nodo in arbol:
+                md += f"# {nodo['title']}\n\n"
+                for hijo in nodo.get("children", []):
+                    md += f"## {hijo['title']}\n\n"
+            return md
+        esquema = secciones_markdown(indice)
         prompt = (
             f"A continuación tienes el contenido del documento '{doc.file_name}'. "
-            "Resume su información en un análisis funcional claro y estructurado.\n\n"
-            f"{texto}"
+            "Resume su información en un análisis funcional claro y estructurado, siguiendo exactamente el siguiente esquema de secciones en markdown. "
+            "Rellena cada sección y subsección con la información relevante del documento. Si alguna sección no aplica, indícalo brevemente.\n\n"
+            f"ESQUEMA:\n{esquema}\n\nCONTENIDO DEL DOCUMENTO:\n{texto}"
         )
         headers = {
             "api-key": AZURE_OPENAI_API_KEY,
@@ -45,7 +61,7 @@ async def generar_funcional_ia() -> str:
                 {"role": "system", "content": "Eres un analista funcional experto."},
                 {"role": "user", "content": prompt},
             ],
-            "max_tokens": 800,
+            "max_tokens": 1800,
             "temperature": 0.7,
             "top_p": 1,
             "frequency_penalty": 0,

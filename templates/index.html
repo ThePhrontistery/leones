@@ -1,12 +1,8 @@
 {% extends "base.html" %} {% block content %}
-<div class="w-full h-screen flex flex-col justify-center items-center p-0 m-0">
-  <div
-    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full h-full"
-  >
-    <!-- Panel de carga de documentos -->
-    <section
-      class="bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col min-h-[400px] h-full"
-    >
+<div class="w-full min-h-screen h-screen flex flex-col justify-center items-center p-0 m-0 overflow-hidden">
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-4 w-full h-full max-h-full">
+    <!-- Primera columna: Carga de documentos -->
+    <section class="col-span-2 bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col h-full min-h-0">
       <h3 class="font-semibold text-xl text-blue-700 mb-4">
         Carga de documentos
       </h3>
@@ -56,49 +52,42 @@
       </div>
     </section>
 
-    <!-- Árbol de contenidos (ahora en la segunda columna) -->
-    <section
-      class="bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col min-h-[400px] h-full"
-    >
-      <h3 class="font-semibold text-xl text-blue-700 mb-4">
-        Árbol de contenidos
-      </h3>
-      <div
-        id="panel-tree"
-        class="flex-1 flex items-start justify-start text-slate-400"
-      >
-        <div
-          id="arbol-contenidos"
-          hx-get="/api/document/arbol-contenidos"
-          hx-trigger="load"
-          hx-swap="innerHTML"
-        ></div>
-      </div>
-    </section>
-
-    <!-- Análisis funcional: Editor Markdown y Vista previa (solo estas dos secciones) -->
-    <section
-      class="bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col min-h-[400px] h-full"
-    >
-      <h3 class="font-semibold text-xl text-blue-700 mb-4">
-        Análisis funcional (Markdown)
-      </h3>
-      <div id="panel-markdown" class="flex-1 flex flex-col gap-4">
-        <!-- Editor Markdown -->
-        <div id="markdown-editor" class="mb-4">
-          <!-- Aquí va el editor markdown -->
+    <!-- Segunda columna: Panel Análisis funcional con 3 secciones horizontales -->
+    <section class="col-span-8 bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col h-full min-h-0">
+      <h3 class="font-semibold text-xl text-blue-700 mb-4">Análisis funcional</h3>
+      <div id="panel-markdown" class="flex flex-row gap-4 w-full h-full max-h-full">
+        <!-- Sección 1: Árbol de Contenidos -->
+        <div class="flex-1 flex flex-col min-h-0 h-full">
+          <div class="bg-white rounded-lg shadow p-4 flex-1 flex flex-col">
+            <div class="font-semibold text-blue-700 mb-2">Árbol de contenidos</div>
+            <div id="panel-tree" class="flex-1 flex items-start justify-start text-slate-400">
+              <div id="arbol-contenidos" hx-get="/api/document/arbol-contenidos" hx-trigger="load" hx-swap="innerHTML"></div>
+            </div>
+          </div>
         </div>
-        <!-- Vista previa -->
-        <div id="markdown-preview" class="bg-white rounded p-4 border border-slate-200 min-h-[150px]">
-          <!-- Aquí va la vista previa del markdown renderizado -->
+        <!-- Sección 2: Editor Markdown -->
+        <div class="flex-1 flex flex-col min-h-0 h-full">
+          <div class="bg-white rounded-lg shadow p-4 flex-1 flex flex-col">
+            <div class="font-semibold text-blue-700 mb-2">Editor Markdown</div>
+            <div id="markdown-editor" class="flex-1 mb-4">
+              <!-- Aquí va el editor markdown -->
+            </div>
+          </div>
+        </div>
+        <!-- Sección 3: Vista previa -->
+        <div class="flex-1 flex flex-col min-h-0 h-full">
+          <div class="bg-white rounded-lg shadow p-4 flex-1 flex flex-col">
+            <div class="font-semibold text-blue-700 mb-2">Vista previa</div>
+            <div id="markdown-preview" class="flex-1 bg-white rounded p-2 border border-slate-200 min-h-[150px]">
+              <!-- Aquí va la vista previa del markdown renderizado -->
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Chat lateral con IA -->
-    <section
-      class="bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col min-h-[400px] h-full"
-    >
+    <!-- Tercera columna: Chat lateral con IA -->
+    <section class="col-span-2 bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col h-full min-h-0">
       <h3 class="font-semibold text-xl text-blue-700 mb-4">Chat IA (Agent)</h3>
       <div
         id="panel-chat"

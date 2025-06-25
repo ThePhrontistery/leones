@@ -25,7 +25,7 @@ async def generar_funcional(request: Request):
         resultado_html = markdown.markdown(resultado_md or "", extensions=["extra", "tables", "fenced_code"])
         plantilla_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Documents", "Plantilla_Funcional.md"))
         indice = parse_template_tree(plantilla_path)
-        content = templates.TemplateResponse(
+        return templates.TemplateResponse(
             "funcional_result_y_indice.html",
             {
                 "request": request,
@@ -34,8 +34,6 @@ async def generar_funcional(request: Request):
                 "indice": indice
             }
         )
-        ok_html = '<span class="ml-2 text-green-600" hx-swap-oob="true" id="generar-funcional-indicador">✔️</span>'
-        return HTMLResponse(content.body.decode() + ok_html)
     except Exception as e:
         logger.exception("Error en /api/generar-funcional/")
         import traceback

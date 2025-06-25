@@ -11,17 +11,17 @@
     {% include "arbol_contenidos.html" %}
   </aside>
 
-  <!-- Columna 3: Editor Markdown y Vista Previa -->
-  <section class="w-7/12 flex flex-col gap-6">
+  <!-- Columna 3: Análisis funcional (Editor + Vista Previa lado a lado) -->
+  <section class="w-7/12 flex flex-row gap-6">
     <!-- Editor Markdown -->
-    <div class="bg-white/80 rounded-lg shadow p-4">
+    <div class="w-1/2 bg-white/80 rounded-lg shadow p-4 flex flex-col">
       <h2 class="text-lg font-bold mb-2 text-blue-700">Editor Markdown</h2>
-      <pre class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto overflow-y-auto max-h-96" id="markdown-editor-content">{{ resultado_md }}</pre>
+      <pre class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto overflow-y-auto max-h-96 flex-1" id="markdown-editor-content">{{ resultado_md }}</pre>
     </div>
     <!-- Vista Previa -->
-    <div class="bg-white/80 rounded-lg shadow p-4">
+    <div class="w-1/2 bg-white/80 rounded-lg shadow p-4 flex flex-col">
       <h2 class="text-lg font-bold mb-2 text-blue-700">Vista Previa</h2>
-      <div id="panel-funcional" class="prose max-w-none overflow-y-auto max-h-96">{{ resultado_html | safe }}</div>
+      <div id="panel-funcional" class="prose max-w-none overflow-y-auto max-h-96 flex-1">{{ resultado_html | safe }}</div>
     </div>
   </section>
 </div>

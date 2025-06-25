@@ -16,7 +16,7 @@
     <!-- Editor Markdown -->
     <div class="bg-white/80 rounded-lg shadow p-4">
       <h2 class="text-lg font-bold mb-2 text-blue-700">Editor Markdown</h2>
-      <pre class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto">{{ resultado_md }}</pre>
+      <pre class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto overflow-y-auto max-h-96" id="markdown-editor-content">{{ resultado_md }}</pre>
     </div>
     <!-- Vista Previa -->
     <div class="bg-white/80 rounded-lg shadow p-4">
@@ -25,4 +25,8 @@
     </div>
   </section>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Sin scripts de sincronización ni scroll extra -->
 {% endblock %}

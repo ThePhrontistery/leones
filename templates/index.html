@@ -1,4 +1,6 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
+<script type="module" src="/static/generar_funcional.js"></script>
 <div class="w-full min-h-screen h-screen flex flex-col justify-center items-center p-0 m-0 overflow-hidden">
   <div class="grid grid-cols-1 md:grid-cols-12 gap-4 w-full h-full max-h-full">
     <!-- Primera columna: Carga de documentos -->
@@ -14,32 +16,10 @@
           <button
             type="button"
             onclick="window.open('/api/document/upload', '_blank', 'width=500,height=600')"
-            class="bg-blue-700 text-white px-2 py-1 text-xs rounded hover:bg-blue-800 transition"
+            class="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800 transition min-w-[200px] text-sm"
           >
-            Abrir carga de documento
+            Abrir carga de documentos
           </button>
-          <button
-            type="button"
-            hx-post="/api/document/clear"
-            hx-target="#document-list"
-            hx-swap="innerHTML"
-            class="bg-red-600 text-white px-2 py-1 text-xs rounded hover:bg-red-700 transition"
-          >
-            Borrar todos
-          </button>
-          <button
-            type="button"
-            hx-post="/api/generar-funcional/"
-            hx-target="#panel-markdown"
-            hx-swap="innerHTML"
-            hx-indicator="#generar-funcional-indicador"
-            class="bg-green-700 text-white px-2 py-1 text-xs rounded hover:bg-green-800 transition"
-          >
-            Generar Funcional
-          </button>
-          <div id="generar-funcional-indicador" class="flex items-center ml-2">
-            <!-- Aquí se mostrará el estado: generando..., ok, error -->
-          </div>
         </div>
         <div id="upload-result" class="mt-2"></div>
         <div
@@ -49,6 +29,32 @@
           hx-swap="innerHTML"
           class="mt-2"
         ></div>
+        <div class="flex flex-row gap-2 mt-4 justify-start">
+          <button
+            type="button"
+            hx-post="/api/document/clear"
+            hx-target="#document-list"
+            hx-swap="innerHTML"
+            class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition min-w-[200px] text-sm"
+          >
+            Borrar todos
+          </button>
+        </div>
+        <div class="flex flex-row gap-2 mt-2 justify-start">
+          <button
+            id="generar-funcional-btn"
+            type="button"
+            hx-post="/api/generar-funcional/"
+            hx-target="#panel-markdown"
+            hx-swap="innerHTML"
+            hx-indicator="#generar-funcional-indicador"
+            class="bg-green-700 text-white px-3 py-1 rounded hover:bg-green-800 transition min-w-[200px] text-sm"
+            onclick="mostrarReloj()"
+          >
+            Generar Funcional
+          </button>
+          <span id="generar-funcional-indicador" class="flex items-center ml-2"></span>
+        </div>
       </div>
     </section>
 

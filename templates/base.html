@@ -18,12 +18,14 @@
         <h1 class="text-3xl font-bold text-blue-700 drop-shadow-sm">
           {{ title or "Metasketch" }}
         </h1>
-        {% if user %}
-        <div class="flex items-center space-x-4">
+        <nav class="flex items-center space-x-4">
+          <a href="/" class="text-blue-700 hover:underline">Inicio</a>
+          <a href="/chat/sugerencias" class="text-blue-700 hover:underline">Chat IA (Agent)</a>
+          {% if user %}
           <span class="text-blue-800 font-semibold">Bienvenido, {{ user }} 👋</span>
           <a href="/logout" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 transition">Logout</a>
-        </div>
-        {% endif %}
+          {% endif %}
+        </nav>
       </header>
       <main class="flex-1 flex items-center justify-center">
         {% block content %}{% endblock %}

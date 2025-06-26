@@ -100,16 +100,17 @@
         class="flex-1 flex flex-col items-center justify-center text-slate-400"
       >
         <!-- Vacío al inicio -->
-        <button
-          type="button"
-          hx-post="/api/chat/saludo"
-          hx-target="#panel-chat"
-          hx-swap="innerHTML"
-          class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition mb-4"
-        >
-          Preguntar IA: Saludar
-        </button>
-        <!-- Aquí irá la respuesta del chat IA -->
+        <!-- Sección superior: prompt enviado y respuesta IA -->
+        <div id="chat-ia-panel" class="w-full mb-4">
+          <div id="chat-ia-historial" hx-get="/api/chat/ultimo" hx-trigger="load,chatActualizado from:body" hx-target="#chat-ia-panel" hx-swap="innerHTML">
+            <div class="text-gray-400 italic">No hay consulta aún.</div>
+          </div>
+        </div>
+        <!-- Sección inferior: campo de texto y botón enviar -->
+        <form id="chat-ia-form" hx-post="/api/chat/ask" hx-target="#chat-ia-panel" hx-swap="innerHTML" class="flex flex-col gap-4 w-full">
+          <textarea name="prompt" required placeholder="Escribe tu pregunta o prompt..." class="border rounded p-2 w-full min-h-[60px] focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+          <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition">Enviar</button>
+        </form>
       </div>
     </section>
   </div>

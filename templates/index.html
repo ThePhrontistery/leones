@@ -109,8 +109,24 @@
         <!-- Sección inferior: campo de texto y botón enviar -->
         <form id="chat-ia-form" hx-post="/api/chat/ask" hx-target="#chat-ia-panel" hx-swap="innerHTML" class="flex flex-col gap-4 w-full">
           <textarea name="prompt" required placeholder="Escribe tu pregunta o prompt..." class="border rounded p-2 w-full min-h-[60px] focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+          <input type="hidden" name="contexto" id="chat-contexto-markdown" value="">
           <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition">Enviar</button>
         </form>
+        <script>
+        // Siempre añade el contenido actual del editor Markdown como contexto antes de enviar el prompt
+        document.addEventListener('htmx:configRequest', function(evt) {
+          if (evt.detail.elt && evt.detail.elt.id === 'chat-ia-form') {
+            // Busca el textarea del editor markdown en toda la página
+            var markdown = document.querySelector('#markdown-editor-content');
+            var contextoInput = evt.detail.elt.querySelector('input[name="contexto"]');
+            if (markdown && contextoInput) {
+              contextoInput.value = markdown.value;
+            } else {
+              contextoInput.value = '';
+            }
+          }
+        });
+        </script>
       </div>
     </section>
   </div>

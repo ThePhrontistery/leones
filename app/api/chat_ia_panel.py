@@ -17,12 +17,18 @@ ultima_respuesta = ""
 async def chat_ia_ask(request: Request, prompt: str = Form(...), contexto: str = Form("")):
     global ultimo_prompt, ultima_respuesta
     ultimo_prompt = prompt
-    # DEBUG: Log para asegurar que el contexto no está vacío
-    if not contexto or len(contexto.strip()) < 10:
-        print("[ADVERTENCIA] El contexto enviado al chat IA está vacío o es muy corto.")
+
+    # Obtener el contenido del documento funcional desde el servicio
+    markdown_context = get_markdown_funcional()
+    if not markdown_context.strip():
+        print("[ADVERTENCIA] El documento funcional está vacío o no se pudo cargar.")
     else:
-        print(f"[DEBUG] Longitud del contexto enviado a la IA: {len(contexto)} caracteres")
-    ultima_respuesta = await chat_ia_azure_openai(prompt, contexto=contexto)
+        print(f"[DEBUG] Longitud del documento funcional enviado como contexto: {len(markdown_context)} caracteres")
+
+    # Combinar el contexto proporcionado con el contenido del documento funcional
+    contexto_completo = f"{contexto}\n\n{markdown_context}" if contexto.strip() else markdown_context
+
+    ultima_respuesta = await chat_ia_azure_openai(prompt, contexto=contexto_completo)
     return templates.TemplateResponse(
         "partials/chat_ia_panel.html",
         {"request": request, "prompt": ultimo_prompt, "respuesta": ultima_respuesta}

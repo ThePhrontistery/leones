@@ -105,6 +105,13 @@
                 }
                 textarea?.addEventListener('input', renderPreview);
                 document.addEventListener('DOMContentLoaded', renderPreview);
+
+                // Sincroniza el scroll vertical del editor con la vista previa
+                textarea?.addEventListener('scroll', function() {
+                  if (!preview) return;
+                  const ratio = textarea.scrollTop / (textarea.scrollHeight - textarea.clientHeight);
+                  preview.scrollTop = ratio * (preview.scrollHeight - preview.clientHeight);
+                });
               </script>
             </div>
           </div>

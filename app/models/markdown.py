@@ -20,3 +20,4 @@ class MarkdownDocument(BaseModel):
 
     class Config:
         orm_mode = True
+        from_attributes = True  # Necesario para Pydantic v2+

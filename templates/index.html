@@ -74,9 +74,38 @@
         <!-- Sección 2: Editor Markdown -->
         <div class="flex-1 flex flex-col min-h-0 h-full">
           <div class="bg-white rounded-lg shadow p-4 flex-1 flex flex-col">
-            <div class="font-semibold text-blue-700 mb-2">Editor Markdown</div>
+            <div class="font-semibold text-blue-700 mb-2 flex flex-row items-center justify-between gap-2">
+              <span>Editor Markdown</span>
+              <div class="flex flex-row gap-2 items-center">
+                <button id="guardar-markdown-btn" class="bg-blue-600 text-white px-4 py-1 text-xs rounded hover:bg-blue-700 transition min-w-[140px]">Guardar cambios</button>
+                <button id="exportar-markdown-btn" class="bg-green-600 text-white px-2 py-1 text-xs rounded hover:bg-green-700 transition">Exportar</button>
+                <select id="exportar-formato" class="px-1 py-1 rounded border border-slate-300 text-[10px] w-14 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  <option value="word">Word</option>
+                  <option value="pdf" disabled>PDF (próximamente)</option>
+                </select>
+              </div>
+            </div>
             <div id="markdown-editor" class="flex-1 mb-4">
-              <!-- Aquí va el editor markdown -->
+              <textarea id="markdown-editor-content" class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto overflow-y-auto h-full min-h-0 w-full resize-none focus:outline-none focus:ring-2 focus:ring-blue-400" spellcheck="false">{{ markdown_content }}</textarea>
+              <div id="guardar-msg" class="mt-2 text-sm"></div>
+              <script>
+                // Sincroniza la vista previa en tiempo real
+                const textarea = document.getElementById('markdown-editor-content');
+                const preview = document.getElementById('markdown-preview');
+                function renderPreview() {
+                  if (textarea && preview) {
+                    fetch('/api/markdown/preview', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ content: textarea.value })
+                    })
+                    .then(res => res.text())
+                    .then(html => { preview.innerHTML = html; });
+                  }
+                }
+                textarea?.addEventListener('input', renderPreview);
+                document.addEventListener('DOMContentLoaded', renderPreview);
+              </script>
             </div>
           </div>
         </div>
@@ -84,9 +113,7 @@
         <div class="flex-1 flex flex-col min-h-0 h-full">
           <div class="bg-white rounded-lg shadow p-4 flex-1 flex flex-col">
             <div class="font-semibold text-blue-700 mb-2">Vista previa</div>
-            <div id="markdown-preview" class="flex-1 bg-white rounded p-2 border border-slate-200 min-h-[150px]">
-              <!-- Aquí va la vista previa del markdown renderizado -->
-            </div>
+            <div id="markdown-preview" class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-y-auto h-full min-h-0 w-full resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 prose max-w-none text-xs">{{ vista_previa | safe }}</div>
           </div>
         </div>
       </div>

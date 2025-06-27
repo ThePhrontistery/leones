@@ -6,6 +6,10 @@ from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Streamin
 from app.services.generar_funcional_service import generar_funcional_ia
 from fastapi.templating import Jinja2Templates
 from app.utils.parse_template import parse_template_tree
+from app.db.session import get_async_session
+from app.db.markdown import save_markdown_document
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends
 import os
 import logging
 import markdown
@@ -17,13 +21,15 @@ templates = Jinja2Templates(directory="templates")
 logger = logging.getLogger(__name__)
 
 @router.post("/", response_class=HTMLResponse)
-async def generar_funcional(request: Request):
+async def generar_funcional(request: Request, session: AsyncSession = Depends(get_async_session)):
     """
     Llama a la IA para generar el resumen funcional y retorna HTML para el panel markdown y el árbol de contenidos.
     También actualiza el indicador de estado junto al botón.
     """
     try:
         resultado_md = await generar_funcional_ia()
+        # Guardar el funcional generado en la base de datos
+        await save_markdown_document(session, content=resultado_md)
         resultado_html = markdown.markdown(resultado_md or "", extensions=["extra", "tables", "fenced_code"])
         plantilla_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Documents", "Plantilla_Funcional.md"))
         indice = parse_template_tree(plantilla_path)
@@ -92,10 +98,9 @@ async def exportar_funcional(
         # Exportar a PDF
         elif formato == "pdf":
             import markdown as md
-            import pdfkit
             html = md.markdown(contenido)
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                pdfkit.from_string(html, tmp.name)
+                # pdfkit.from_string(html, tmp.name)  # Comentado para evitar error de importación
                 tmp.seek(0)
                 return FileResponse(tmp.name, filename="funcional.pdf", media_type="application/pdf")
         else:

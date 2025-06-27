@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="flex-1 min-h-0">
-        <textarea class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto overflow-y-auto h-full min-h-0 w-full resize-none focus:outline-none focus:ring-2 focus:ring-blue-400" id="markdown-editor-content" name="markdown-editor-content" spellcheck="false">{{ resultado_md }}</textarea>
+        <textarea class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto overflow-y-auto h-full min-h-0 w-full resize-none focus:outline-none focus:ring-2 focus:ring-blue-400" id="markdown-editor-content" name="markdown-editor-content" spellcheck="false" hx-get="/api/markdown/get" hx-trigger="load" hx-target="#markdown-editor-content" hx-swap="outerHTML">{{ resultado_md }}</textarea>
       </div>
       <div id="guardar-msg" class="mt-2 text-sm"></div>
     </div>

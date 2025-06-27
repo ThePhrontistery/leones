@@ -4,43 +4,43 @@
 <div class="w-full min-h-screen h-screen flex flex-col justify-center items-center p-0 m-0 overflow-hidden">
   <div class="grid grid-cols-1 md:grid-cols-12 gap-4 w-full h-full max-h-full">
     <!-- Primera columna: Carga de documentos -->
-    <section class="col-span-2 bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col h-full min-h-0">
-      <h3 class="font-semibold text-xl text-blue-700 mb-4">
+    <section class="col-span-1 bg-slate-50 rounded-2xl p-3 shadow-lg border border-slate-200 flex flex-col h-full min-h-0">
+      <h3 class="font-semibold text-base text-blue-700 mb-2">
         Carga de documentos
       </h3>
       <div
         id="panel-upload"
-        class="flex flex-col items-stretch gap-2 text-slate-400"
+        class="flex flex-col items-stretch gap-1 text-slate-400"
       >
-        <div class="flex flex-row gap-2 mb-2 justify-start">
+        <div class="flex flex-row gap-1 mb-1 justify-start">
           <button
             type="button"
             onclick="window.open('/api/document/upload', '_blank', 'width=500,height=600')"
-            class="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800 transition min-w-[200px] text-sm"
+            class="bg-blue-700 text-white px-2 py-1 rounded hover:bg-blue-800 transition min-w-[120px] text-xs"
           >
             Abrir carga de documentos
           </button>
         </div>
-        <div id="upload-result" class="mt-2"></div>
+        <div id="upload-result" class="mt-1"></div>
         <div
           id="document-list"
           hx-get="/api/document/list"
           hx-trigger="load,documentUploaded from:body"
           hx-swap="innerHTML"
-          class="mt-2"
+          class="mt-1 text-xs"
         ></div>
-        <div class="flex flex-row gap-2 mt-4 justify-start">
+        <div class="flex flex-row gap-1 mt-2 justify-start">
           <button
             type="button"
             hx-post="/api/document/clear"
             hx-target="#document-list"
             hx-swap="innerHTML"
-            class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition min-w-[200px] text-sm"
+            class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition min-w-[120px] text-xs"
           >
             Borrar todos
           </button>
         </div>
-        <div class="flex flex-row gap-2 mt-2 justify-start">
+        <div class="flex flex-row gap-1 mt-1 justify-start">
           <button
             id="generar-funcional-btn"
             type="button"
@@ -48,12 +48,12 @@
             hx-target="#panel-markdown"
             hx-swap="innerHTML"
             hx-indicator="#generar-funcional-indicador"
-            class="bg-green-700 text-white px-3 py-1 rounded hover:bg-green-800 transition min-w-[200px] text-sm"
+            class="bg-green-700 text-white px-2 py-1 rounded hover:bg-green-800 transition min-w-[120px] text-xs"
             onclick="mostrarReloj()"
           >
             Generar Funcional
           </button>
-          <span id="generar-funcional-indicador" class="flex items-center ml-2"></span>
+          <span id="generar-funcional-indicador" class="flex items-center ml-1"></span>
         </div>
       </div>
     </section>
@@ -63,7 +63,7 @@
       <h3 class="font-semibold text-xl text-blue-700 mb-4">Análisis funcional</h3>
       <div id="panel-markdown" class="flex flex-row gap-4 w-full h-full max-h-full">
         <!-- Sección 1: Árbol de Contenidos -->
-        <div class="flex-1 flex flex-col min-h-0 h-full">
+        <div class="flex flex-col min-h-0 h-full max-w-[180px]">
           <div class="bg-white rounded-lg shadow p-4 flex-1 flex flex-col">
             <div class="font-semibold text-blue-700 mb-2">Árbol de contenidos</div>
             <div id="panel-tree" class="flex-1 flex items-start justify-start text-slate-400">
@@ -72,12 +72,12 @@
           </div>
         </div>
         <!-- Sección 2: Editor Markdown -->
-        <div class="flex-1 flex flex-col min-h-0 h-full">
-          <div class="bg-white rounded-lg shadow p-4 flex-1 flex flex-col">
-            <div class="font-semibold text-blue-700 mb-2 flex flex-row items-center justify-between gap-2">
+        <div class="flex-1 flex flex-col min-h-0 h-full max-w-full">
+          <div class="bg-white rounded-lg shadow p-4 flex-1 flex flex-col items-center">
+            <div class="font-semibold text-blue-700 mb-2 flex flex-row items-center justify-between gap-2 w-full">
               <span>Editor Markdown</span>
               <div class="flex flex-row gap-2 items-center">
-                <button id="guardar-markdown-btn" class="bg-blue-600 text-white px-4 py-1 text-xs rounded hover:bg-blue-700 transition min-w-[140px]">Guardar cambios</button>
+                <button id="guardar-markdown-btn" class="bg-blue-600 text-white px-4 py-1 text-xs rounded hover:bg-blue-700 transition min-w-[120px]">Guardar cambios</button>
                 <button id="exportar-markdown-btn" class="bg-green-600 text-white px-2 py-1 text-xs rounded hover:bg-green-700 transition">Exportar</button>
                 <select id="exportar-formato" class="px-1 py-1 rounded border border-slate-300 text-[10px] w-14 focus:outline-none focus:ring-2 focus:ring-blue-400">
                   <option value="word">Word</option>
@@ -85,8 +85,10 @@
                 </select>
               </div>
             </div>
-            <div id="markdown-editor" class="flex-1 mb-4">
-              <textarea id="markdown-editor-content" class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto overflow-y-auto h-full min-h-0 w-full resize-none focus:outline-none focus:ring-2 focus:ring-blue-400" spellcheck="false">{{ markdown_content }}</textarea>
+            <div id="markdown-editor" class="flex-1 mb-4 w-full flex justify-center">
+              <div class="w-full max-w-[54ch] ml-[-16px]">
+                <textarea id="markdown-editor-content" class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-1 rounded border border-slate-200 overflow-x-auto overflow-y-auto h-full min-h-0 w-full resize-none focus:outline-none focus:ring-2 focus:ring-blue-400" spellcheck="false">{{ markdown_content }}</textarea>
+              </div>
               <div id="guardar-msg" class="mt-2 text-sm"></div>
               <script>
                 // Sincroniza la vista previa en tiempo real
@@ -117,10 +119,12 @@
           </div>
         </div>
         <!-- Sección 3: Vista previa -->
-        <div class="flex-1 flex flex-col min-h-0 h-full">
-          <div class="bg-white rounded-lg shadow p-4 flex-1 flex flex-col">
-            <div class="font-semibold text-blue-700 mb-2">Vista previa</div>
-            <div id="markdown-preview" class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-y-auto h-full min-h-0 w-full resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 prose max-w-none text-xs">{{ vista_previa | safe }}</div>
+        <div class="flex-1 flex flex-col min-h-0 h-full max-w-full">
+          <div class="bg-white rounded-lg shadow p-4 flex-1 flex flex-col items-center">
+            <div class="font-semibold text-blue-700 mb-2 w-full">Vista previa</div>
+            <div id="markdown-preview-wrapper" class="w-full flex justify-center mt-8">
+              <div id="markdown-preview" class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-1 rounded border border-slate-200 overflow-y-auto h-full min-h-0 w-full max-w-[45ch] resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 prose max-w-none text-sm">{{ vista_previa | safe }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -135,9 +139,9 @@
       >
         <!-- Vacío al inicio -->
         <!-- Sección superior: prompt enviado y respuesta IA -->
-        <div id="chat-ia-panel" class="w-full mb-4">
+        <div id="chat-ia-panel" class="w-full mb-0">
           <div id="chat-ia-historial" hx-get="/api/chat/ultimo" hx-trigger="load,chatActualizado from:body" hx-target="#chat-ia-panel" hx-swap="innerHTML">
-            <div class="text-gray-400 italic">No hay consulta aún.</div>
+            <div class="min-h-[220px] max-h-[400px] overflow-y-auto text-base bg-white rounded shadow p-4 border border-slate-200">No hay consulta aún.</div>
           </div>
         </div>
         <!-- Sección inferior: campo de texto y botón enviar -->

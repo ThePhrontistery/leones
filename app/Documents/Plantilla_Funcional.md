@@ -1,7 +1,7 @@
 # 1. Introducción
 ## 1.1. Objetivos principales
 # 2. Contexto
-# 3. Alcance**
+# 3. Alcance
 # 4. Funcionalidades principales
 ## 4.1. Requisitos funcionales
 ## 4.2 .Requisitos NFR

@@ -1,57 +1,25 @@
 <!-- Fragmento HTML para mostrar el documento funcional generado en el panel Markdown -->
 <div id="panel-funcional" class="w-full bg-white p-4 rounded shadow flex flex-col gap-6">
-  <!-- Sección 1: Editor Markdown editable -->
-  <div>
-    <div class="font-semibold text-blue-700 mb-2">Markdown</div>
-    <textarea id="markdown-input" class="w-full h-72 bg-slate-50 rounded p-2 text-slate-800 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-200 overflow-y-auto resize-none" spellcheck="false">{{ resultado|default('', true) }}</textarea>
+  <div class="flex flex-row gap-4 w-full">
+    <!-- Editor Markdown editable -->
+    <div class="w-1/2 flex flex-col">
+      <div class="font-semibold text-blue-700 mb-2">Markdown</div>
+      <textarea id="markdown-editor-content" class="w-full h-72 bg-slate-50 rounded p-2 text-slate-800 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-200 overflow-y-auto resize-none" spellcheck="false">{{ resultado_md|default('', true) }}</textarea>
+      <div class="flex flex-row gap-2 mt-2">
+        <button id="guardar-markdown-btn" class="bg-blue-600 text-white px-4 py-1 text-xs rounded hover:bg-blue-700 transition min-w-[140px]">Guardar cambios</button>
+        <button id="exportar-markdown-btn" class="bg-green-600 text-white px-2 py-1 text-xs rounded hover:bg-green-700 transition">Exportar</button>
+        <select id="exportar-formato" class="px-1 py-1 rounded border border-slate-300 text-[10px] w-14 focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="word">Word</option>
+          <option value="pdf" disabled>PDF (próximamente)</option>
+        </select>
+        <div id="guardar-msg" class="ml-4 text-sm"></div>
+      </div>
+    </div>
+    <!-- Vista previa renderizada como HTML, mismo tamaño y scroll -->
+    <div class="w-1/2 flex flex-col">
+      <div class="font-semibold text-blue-700 mb-2">Vista previa</div>
+      <div id="markdown-preview" class="prose prose-slate w-full h-72 overflow-y-auto bg-slate-50 rounded p-2 border border-slate-200"></div>
+    </div>
   </div>
-  <!-- Sección 2: Vista previa renderizada como HTML, mismo tamaño y scroll -->
-  <div>
-    <div class="font-semibold text-blue-700 mb-2">Vista previa</div>
-    <div id="markdown-preview" class="prose prose-slate w-full h-72 overflow-y-auto bg-slate-50 rounded p-2 border border-slate-200"></div>
-  </div>
-  {% if doc %}
-  <div class="mt-4 p-4 bg-slate-100 rounded border border-slate-200">
-    <div class="text-xs text-slate-500 mb-1">{{ doc.categoria }} | {{ doc.fecha_carga }}</div>
-    <div class="text-xs text-slate-400">{{ doc.descripcion or '—' }}</div>
-  </div>
-  {% endif %}
 </div>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-{% raw %}
-<script>
-  function preprocessAnchors(md) {
-    // Convierte '# Título {#anchor}' en '# Título <span data-anchor="anchor"></span>'
-    return md.replace(/^(#+)\s+(.+?)\s*\{#([a-zA-Z0-9_\-]+)\}$/gm, function(_, hashes, title, anchor) {
-      return `${hashes} ${title} <span data-anchor="${anchor}"></span>`;
-    });
-  }
-  function postprocessAnchors(html) {
-    // Convierte <h1>Texto <span data-anchor="id"></span></h1> en <h1 id="id">Texto</h1>
-    return html.replace(/<(h[1-6])>([^<]+?) <span data-anchor="([a-zA-Z0-9_\-]+)"><\/span><\/h[1-6]>/g, function(_, tag, text, id) {
-      return `<${tag} id="${id}">${text}</${tag}>`;
-    });
-  }
-  function renderPreview() {
-    const textarea = document.getElementById('markdown-input');
-    const preview = document.getElementById('markdown-preview');
-    if (textarea && preview) {
-      let md = textarea.value;
-      md = preprocessAnchors(md);
-      let html = window.marked ? marked.parse(md) : md;
-      html = postprocessAnchors(html);
-      preview.innerHTML = html;
-    }
-  }
-  document.addEventListener('DOMContentLoaded', renderPreview);
-  document.getElementById('markdown-input')?.addEventListener('input', renderPreview);
-  // Renderizar también tras HTMX swap
-  document.body.addEventListener('htmx:afterSwap', function(evt) {
-    if (evt.detail && evt.detail.target && evt.detail.target.id === 'panel-funcional') {
-      renderPreview();
-      // Scroll automático a la sección resaltada si existe
-      // El siguiente bloque se deja en blanco para evitar conflicto con Jinja2
-    }
-  });
-</script>
-{% endraw %}
+<!-- El renderizado y guardado se gestiona por guardar_markdown.js -->

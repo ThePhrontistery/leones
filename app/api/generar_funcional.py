@@ -20,28 +20,32 @@ router = APIRouter(prefix="/api/generar-funcional", tags=["generar-funcional"])
 templates = Jinja2Templates(directory="templates")
 logger = logging.getLogger(__name__)
 
+async def _render_panel_funcional_fragment(request: Request, resultado_md: str, resultado_html: str):
+    """
+    Devuelve solo el fragmento del panel funcional (editor, preview, árbol) para insertar en #panel-markdown.
+    """
+    return templates.TemplateResponse(
+        "panel_funcional.html",
+        {
+            "request": request,
+            "resultado_md": resultado_md,
+            "resultado_html": resultado_html,
+        }
+    )
+
 @router.post("/", response_class=HTMLResponse)
 async def generar_funcional(request: Request, session: AsyncSession = Depends(get_async_session)):
     """
-    Llama a la IA para generar el resumen funcional y retorna HTML para el panel markdown y el árbol de contenidos.
-    También actualiza el indicador de estado junto al botón.
+    Llama a la IA para generar el resumen funcional y retorna SOLO el fragmento del panel funcional para la home.
     """
     try:
         resultado_md = await generar_funcional_ia()
-        # Guardar el funcional generado en la base de datos
-        await save_markdown_document(session, content=resultado_md)
-        resultado_html = markdown.markdown(resultado_md or "", extensions=["extra", "tables", "fenced_code"])
-        plantilla_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Documents", "Plantilla_Funcional.md"))
-        indice = parse_template_tree(plantilla_path)
-        return templates.TemplateResponse(
-            "funcional_result_y_indice.html",
-            {
-                "request": request,
-                "resultado_html": resultado_html,
-                "resultado_md": resultado_md,
-                "indice": indice
-            }
-        )
+        # Guardar en BBDD
+        doc = await save_markdown_document(session, content=resultado_md)
+        resultado_md_db = doc.content if doc else resultado_md
+        import markdown as md
+        resultado_html = md.markdown(resultado_md_db or "", extensions=["extra", "tables", "fenced_code"])
+        return await _render_panel_funcional_fragment(request, resultado_md_db, resultado_html)
     except Exception as e:
         logger.exception("Error en /api/generar-funcional/")
         import traceback
@@ -50,19 +54,20 @@ async def generar_funcional(request: Request, session: AsyncSession = Depends(ge
         debug_html = f'<pre class="text-xs text-red-500 bg-red-50 p-2 rounded mt-2">{tb}</pre>'
         return HTMLResponse(error_html + debug_html, status_code=500)
 
-@router.post("/guardar")
-async def guardar_funcional(markdown_content: str = Form(...)):
+@router.post("/guardar", response_class=HTMLResponse)
+async def guardar_funcional(request: Request, markdown_content: str = Form(...), session: AsyncSession = Depends(get_async_session)):
     """
-    Guarda el contenido markdown editado por el usuario.
+    Guarda el contenido markdown editado por el usuario y retorna SOLO el fragmento del panel funcional para la home.
     """
     try:
-        # Por ahora, guardar en un archivo temporal. Se puede cambiar a base de datos si se requiere.
-        with open("/tmp/funcional_guardado.md", "w", encoding="utf-8") as f:
-            f.write(markdown_content)
-        return JSONResponse({"success": True, "message": "Cambios guardados correctamente."})
+        doc = await save_markdown_document(session, content=markdown_content)
+        resultado_md_db = doc.content if doc else markdown_content
+        import markdown as md
+        resultado_html = md.markdown(resultado_md_db or "", extensions=["extra", "tables", "fenced_code"])
+        return await _render_panel_funcional_fragment(request, resultado_md_db, resultado_html)
     except Exception as e:
         logger.exception("Error al guardar el funcional editado")
-        return JSONResponse({"success": False, "message": str(e)}, status_code=500)
+        return HTMLResponse(f'<div class="text-red-600">Error: {str(e)}</div>', status_code=500)
 
 @router.post("/exportar")
 async def exportar_funcional(

@@ -9,104 +9,10 @@
   </aside>
 
   <!-- Columna 3: Análisis funcional (Editor + Vista Previa lado a lado) -->
-  <section class="w-4/5 flex flex-row gap-4 min-h-0 mt-0 h-full">
-    <!-- Editor Markdown -->
-    <div class="w-1/2 bg-white/80 rounded-lg shadow p-4 flex flex-col h-full min-h-0 mt-0">
-      <div class="flex flex-row items-center justify-between mb-2 gap-2">
-        <h2 class="text-base font-bold text-blue-700 mt-0 mb-0">Editor Markdown</h2>
-        <div class="flex flex-row gap-2 items-center">
-          <button id="guardar-markdown-btn" class="bg-blue-600 text-white px-4 py-1 text-xs rounded hover:bg-blue-700 transition min-w-[140px]">Guardar cambios</button>
-          <button id="exportar-markdown-btn" class="bg-green-600 text-white px-2 py-1 text-xs rounded hover:bg-green-700 transition">Exportar</button>
-          <select id="exportar-formato" class="px-1 py-1 rounded border border-slate-300 text-[10px] w-14 focus:outline-none focus:ring-2 focus:ring-blue-400">
-            <option value="word">Word</option>
-            <option value="pdf" disabled>PDF (próximamente)</option>
-          </select>
-        </div>
-      </div>
-      <div class="flex-1 min-h-0">
-        <textarea class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200 overflow-x-auto overflow-y-auto h-full min-h-0 w-full resize-none focus:outline-none focus:ring-2 focus:ring-blue-400" id="markdown-editor-content" name="markdown-editor-content" spellcheck="false" hx-get="/api/markdown/get" hx-trigger="load" hx-target="#markdown-editor-content" hx-swap="outerHTML">{{ resultado_md }}</textarea>
-      </div>
-      <div id="guardar-msg" class="mt-2 text-sm"></div>
-    </div>
-    <!-- Vista Previa -->
-    <div class="w-1/2 bg-white/80 rounded-lg shadow p-4 flex flex-col h-full min-h-0 mt-0">
-      <div class="flex flex-row items-center justify-center mb-2 gap-2">
-        <h2 class="text-base font-bold text-blue-700 mt-0 mb-0">Vista Previa</h2>
-      </div>
-      <div class="flex-1 min-h-0"><div id="panel-funcional" class="prose max-w-none overflow-y-auto h-full min-h-0 mt-0 text-xs">{{ resultado_html | safe }}</div></div>
-    </div>
-  </section>
+  <div class="w-4/5 flex flex-row gap-4 min-h-0 mt-0 h-full">
+    {% include "funcional_result.html" %}
+  </div>
 </div>
 {% endblock %}
 
-{% block scripts %}
-<script>
-document.body.classList.add('overflow-hidden', 'h-full');
-
-const guardarBtn = document.getElementById('guardar-markdown-btn');
-const exportarBtn = document.getElementById('exportar-markdown-btn');
-const exportarFormato = document.getElementById('exportar-formato');
-const textarea = document.getElementById('markdown-editor-content');
-const msgDiv = document.getElementById('guardar-msg');
-if (guardarBtn && textarea) {
-  guardarBtn.addEventListener('click', async () => {
-    guardarBtn.disabled = true;
-    msgDiv.textContent = 'Guardando...';
-    try {
-      const res = await fetch('/api/generar-funcional/guardar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ markdown_content: textarea.value })
-      });
-      const data = await res.json();
-      if (data.success) {
-        msgDiv.textContent = data.message;
-        msgDiv.className = 'mt-2 text-green-600 text-sm';
-      } else {
-        msgDiv.textContent = data.message || 'Error al guardar.';
-        msgDiv.className = 'mt-2 text-red-600 text-sm';
-      }
-    } catch (e) {
-      msgDiv.textContent = 'Error de red al guardar.';
-      msgDiv.className = 'mt-2 text-red-600 text-sm';
-    } finally {
-      guardarBtn.disabled = false;
-    }
-  });
-}
-if (exportarBtn && exportarFormato && textarea) {
-  exportarBtn.addEventListener('click', async () => {
-    exportarBtn.disabled = true;
-    msgDiv.textContent = 'Exportando...';
-    try {
-      const res = await fetch('/api/generar-funcional/exportar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ markdown_content: textarea.value, formato: exportarFormato.value })
-      });
-      if (res.ok) {
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = exportarFormato.value === 'pdf' ? 'funcional.pdf' : 'funcional.docx';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-        msgDiv.textContent = 'Exportación completada.';
-        msgDiv.className = 'mt-2 text-green-600 text-sm';
-      } else {
-        msgDiv.textContent = 'Error al exportar.';
-        msgDiv.className = 'mt-2 text-red-600 text-sm';
-      }
-    } catch (e) {
-      msgDiv.textContent = 'Error de red al exportar.';
-      msgDiv.className = 'mt-2 text-red-600 text-sm';
-    } finally {
-      exportarBtn.disabled = false;
-    }
-  });
-}
-</script>
-{% endblock %}
+{# No se necesita JS inline, se usa guardar_markdown.js y el script de funcional_result.html #}

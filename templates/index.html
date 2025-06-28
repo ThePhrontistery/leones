@@ -46,16 +46,14 @@
           <button
             id="generar-funcional-btn"
             type="button"
-            hx-post="/api/generar-funcional/"
+            hx-get="/api/generar-funcional/loading"
             hx-target="#panel-markdown"
             hx-swap="innerHTML"
-            hx-indicator="#generar-funcional-indicador"
             class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 transition min-w-[180px] text-sm font-semibold mt-2"
-            onclick="mostrarReloj()"
+            onclick="setTimeout(() => { fetch('/api/generar-funcional/', {method: 'POST'}).then(() => window.location.reload()); }, 300);"
           >
             Generar Funcional
           </button>
-          <span id="generar-funcional-indicador" class="flex items-center ml-1"></span>
         </div>
       </div>
     </section>

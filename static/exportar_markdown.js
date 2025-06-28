@@ -13,9 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
       exportBtn.textContent = "Exportando...";
       try {
         const formData = new FormData();
-        formData.append("markdown_text", editor.value);
-        formData.append("format", formatoCombo.value);
-        const response = await fetch("/api/export/", {
+        formData.append("markdown_content", editor.value); // <-- nombre correcto
+        formData.append("formato", formatoCombo.value);    // <-- nombre correcto
+        const response = await fetch("/api/generar-funcional/exportar", {
           method: "POST",
           body: formData,
         });
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "funcional.docx";
+        a.download = formatoCombo.value === "word" ? "funcional.docx" : "funcional.pdf";
         document.body.appendChild(a);
         a.click();
         a.remove();

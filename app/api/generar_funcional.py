@@ -20,23 +20,10 @@ router = APIRouter(prefix="/api/generar-funcional", tags=["generar-funcional"])
 templates = Jinja2Templates(directory="templates")
 logger = logging.getLogger(__name__)
 
-async def _render_panel_funcional_fragment(request: Request, resultado_md: str, resultado_html: str):
-    """
-    Devuelve solo el fragmento del panel funcional (editor, preview, árbol) para insertar en #panel-markdown.
-    """
-    return templates.TemplateResponse(
-        "panel_funcional.html",
-        {
-            "request": request,
-            "resultado_md": resultado_md,
-            "resultado_html": resultado_html,
-        }
-    )
-
 @router.post("/", response_class=HTMLResponse)
 async def generar_funcional(request: Request, session: AsyncSession = Depends(get_async_session)):
     """
-    Llama a la IA para generar el resumen funcional y retorna SOLO el fragmento del panel funcional para la home.
+    Llama a la IA para generar el resumen funcional y retorna el bloque completo de análisis funcional para la home.
     """
     try:
         resultado_md = await generar_funcional_ia()
@@ -45,7 +32,21 @@ async def generar_funcional(request: Request, session: AsyncSession = Depends(ge
         resultado_md_db = doc.content if doc else resultado_md
         import markdown as md
         resultado_html = md.markdown(resultado_md_db or "", extensions=["extra", "tables", "fenced_code"])
-        return await _render_panel_funcional_fragment(request, resultado_md_db, resultado_html)
+        # Obtener el árbol de contenidos (índice)
+        plantilla_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Documents", "Plantilla_Funcional.md"))
+        indice = parse_template_tree(plantilla_path)
+        return templates.TemplateResponse(
+            "funcional_result_y_indice.html",
+            {
+                "request": request,
+                "markdown_content": resultado_md_db,
+                "vista_previa": resultado_html,
+                "indice": indice,
+                # Para compatibilidad con el template actual:
+                "resultado_md": resultado_md_db,
+                "resultado_html": resultado_html,
+            }
+        )
     except Exception as e:
         logger.exception("Error en /api/generar-funcional/")
         import traceback
@@ -64,7 +65,21 @@ async def guardar_funcional(request: Request, markdown_content: str = Form(...),
         resultado_md_db = doc.content if doc else markdown_content
         import markdown as md
         resultado_html = md.markdown(resultado_md_db or "", extensions=["extra", "tables", "fenced_code"])
-        return await _render_panel_funcional_fragment(request, resultado_md_db, resultado_html)
+        # Obtener el árbol de contenidos (índice)
+        plantilla_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Documents", "Plantilla_Funcional.md"))
+        indice = parse_template_tree(plantilla_path)
+        return templates.TemplateResponse(
+            "funcional_result_y_indice.html",
+            {
+                "request": request,
+                "markdown_content": resultado_md_db,
+                "vista_previa": resultado_html,
+                "indice": indice,
+                # Para compatibilidad con el template actual:
+                "resultado_md": resultado_md_db,
+                "resultado_html": resultado_html,
+            }
+        )
     except Exception as e:
         logger.exception("Error al guardar el funcional editado")
         return HTMLResponse(f'<div class="text-red-600">Error: {str(e)}</div>', status_code=500)
@@ -113,3 +128,10 @@ async def exportar_funcional(
     except Exception as e:
         logger.exception("Error al exportar el funcional")
         return JSONResponse({"success": False, "message": str(e)}, status_code=500)
+
+@router.get("/loading", response_class=HTMLResponse)
+async def loading_panel(request: Request):
+    """
+    Devuelve un panel de loading para mostrar mientras se genera el funcional.
+    """
+    return templates.TemplateResponse("panel_loading_funcional.html", {"request": request})

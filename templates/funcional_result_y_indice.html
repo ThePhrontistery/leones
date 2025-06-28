@@ -1,16 +1,69 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="w-full h-full flex flex-row gap-2 px-2 pt-0 pb-0 min-h-0 overflow-hidden" style="height:100vh;">
-  <!-- Columna 2: Árbol de contenidos -->
-  <aside class="w-1/5 bg-white/70 rounded-lg shadow p-4 h-full flex flex-col min-h-0 mt-0">
-    <h2 class="text-base font-bold mb-2 text-blue-700 mt-0">Árbol de Contenidos</h2>
-    <div class="flex-1 min-h-0"><div class="h-full overflow-y-auto">{% include "arbol_contenidos.html" %}</div></div>
-  </aside>
-
-  <!-- Columna 3: Análisis funcional (Editor + Vista Previa lado a lado) -->
-  <div class="w-4/5 flex flex-row gap-4 min-h-0 mt-0 h-full">
-    {% include "funcional_result.html" %}
+<div id="panel-markdown" class="flex flex-row gap-2 w-full h-full max-h-full overflow-hidden">
+  <!-- Sección 1: Árbol de Contenidos -->
+  <div class="flex flex-col min-h-0 h-full max-w-[140px] overflow-hidden">
+    <div class="bg-white rounded-lg shadow p-2 flex-1 flex flex-col overflow-hidden">
+      <div class="font-bold text-blue-700 mb-2 text-sm">Árbol de contenidos</div>
+      <div id="panel-tree" class="flex-1 flex items-start justify-start text-slate-400 overflow-y-auto text-[10px] h-full" style="max-height:100%; min-height:0;">
+        {% include "arbol_contenidos.html" with context %}
+      </div>
+    </div>
+  </div>
+  <!-- Sección 2: Editor Markdown -->
+  <div class="flex-1 flex flex-col min-h-0 h-full max-w-full overflow-hidden">
+    <div class="bg-white rounded-lg shadow p-2 flex-1 flex flex-col items-center overflow-hidden">
+      <div class="font-bold text-blue-700 mb-2 flex flex-row items-center justify-between gap-2 w-full text-sm">
+        <span>Editor Markdown</span>
+        <div class="flex flex-row gap-2 items-center">
+          <button id="guardar-markdown-btn" class="bg-blue-600 text-white px-2 py-2 text-sm font-semibold rounded hover:bg-blue-700 transition min-w-[90px] mr-2">Guardar</button>
+          <button id="exportar-markdown-btn" class="bg-green-600 text-white px-2 py-2 text-sm font-semibold rounded hover:bg-green-700 transition min-w-[90px]">Exportar</button>
+          <select id="exportar-formato" class="px-1 py-1 rounded border border-slate-300 text-[10px] w-14 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <option value="word">Word</option>
+            <option value="pdf" disabled>PDF (próximamente)</option>
+          </select>
+        </div>
+      </div>
+      <div id="markdown-editor" class="flex-1 mb-2 w-full flex justify-center overflow-hidden">
+        <div class="w-full max-w-[44ch] ml-[-8px]">
+          <textarea id="markdown-editor-content" class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-1 rounded border border-slate-200 overflow-x-auto overflow-y-auto h-full min-h-0 w-full resize-none focus:outline-none focus:ring-2 focus:ring-blue-400" spellcheck="false">{{ markdown_content }}</textarea>
+        </div>
+        <div id="guardar-msg" class="mt-2 text-sm"></div>
+        <script>
+          // Sincroniza la vista previa en tiempo real
+          const textarea = document.getElementById('markdown-editor-content');
+          const preview = document.getElementById('markdown-preview');
+          function renderPreview() {
+            if (textarea && preview) {
+              fetch('/api/markdown/preview', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: textarea.value })
+              })
+              .then(res => res.text())
+              .then(html => { preview.innerHTML = html; });
+            }
+          }
+          textarea?.addEventListener('input', renderPreview);
+          document.addEventListener('DOMContentLoaded', renderPreview);
+          // Sincroniza el scroll vertical del editor con la vista previa
+          textarea?.addEventListener('scroll', function() {
+            if (!preview) return;
+            const ratio = textarea.scrollTop / (textarea.scrollHeight - textarea.clientHeight);
+            preview.scrollTop = ratio * (preview.scrollHeight - preview.clientHeight);
+          });
+        </script>
+      </div>
+    </div>
+  </div>
+  <!-- Sección 3: Vista previa -->
+  <div class="flex-1 flex flex-col min-h-0 h-full max-w-full overflow-hidden">
+    <div class="bg-white rounded-lg shadow p-2 flex-1 flex flex-col items-center overflow-hidden" style="height:100%; min-height:0;">
+      <div class="font-bold text-blue-700 mb-2 w-full text-sm">Vista previa</div>
+      <div id="markdown-preview-wrapper" class="w-full flex justify-center mt-2 overflow-hidden h-full">
+        <div id="markdown-preview" class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-1 rounded border border-slate-200 overflow-y-auto h-full min-h-0 w-full max-w-[36ch] resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 prose max-w-none text-sm" style="height:100%; max-height:100%;">{{ vista_previa | safe }}</div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

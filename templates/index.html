@@ -13,6 +13,7 @@
         <div class="flex flex-row gap-1 mb-2 justify-start">
           <button
             type="button"
+            class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition min-w-[180px] text-sm font-semibold"
             onclick="(function(){
               const w=520, h=600;
               const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
@@ -23,14 +24,13 @@
               const top = ((height - h) / 2) + dualScreenTop;
               window.open('/api/document/upload', '_blank', `width=${w},height=${h},top=${top},left=${left},resizable=yes,scrollbars=yes`);
             })()"
-            class="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800 transition min-w-[140px] text-xs font-semibold"
           >
             Abrir carga de documentos
           </button>
         </div>
-        <div class="bg-white rounded-lg shadow p-2 mb-2 flex flex-col items-stretch w-[90%] mx-auto" style="min-height:180px; max-height:260px;">
+        <div class="bg-white rounded-lg shadow p-2 mb-2 flex flex-col items-stretch w-full mx-auto" style="min-height:340px; max-height:420px;">
           <div id="document-list" hx-get="/api/document/list" hx-trigger="load,documentUploaded from:body,documentDeleted from:body" hx-swap="innerHTML" class="text-[9px] overflow-y-auto flex-1"></div>
-          <div class="flex flex-row gap-1 mt-2 justify-center">
+          <div class="flex flex-row gap-1 mt-2 justify-center w-full">
             <button
               type="button"
               hx-post="/api/document/clear"
@@ -50,6 +50,7 @@
             hx-target="#panel-markdown"
             hx-swap="innerHTML"
             class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 transition min-w-[180px] text-sm font-semibold mt-2"
+            style="position: absolute; bottom: 24px; left: 16px;"
             onclick="setTimeout(() => { fetch('/api/generar-funcional/', {method: 'POST'}).then(() => window.location.reload()); }, 300);"
           >
             Generar Funcional
@@ -135,38 +136,38 @@
       <h3 class="font-bold text-xl text-blue-700 mb-2">ChatBot IA</h3>
       <div
         id="panel-chat"
-        class="flex-1 flex flex-col items-center text-slate-400 overflow-hidden justify-start"
+        class="flex-1 flex flex-col items-center text-slate-400 overflow-hidden justify-start relative"
       >
-        <div class="w-full flex flex-col gap-2 mt-0">
-          <div class="font-bold text-blue-700 text-xs mb-1">Respuesta IA:</div>
-          <div id="chat-ia-panel" class="w-full overflow-x-auto" style="max-width:100%; max-height:200px;">
+        <div class="w-full flex flex-col gap-2 flex-1">
+          <div id="chat-ia-panel" class="w-full overflow-x-hidden" style="max-width:100%; max-height:none;">
             <div id="chat-ia-historial" hx-get="/api/chat/ultimo" hx-trigger="load,chatActualizado from:body" hx-target="#chat-ia-panel" hx-swap="innerHTML">
-              <div class="min-h-[120px] max-h-[200px] overflow-y-auto font-mono text-xs bg-white rounded shadow p-2 border border-slate-200">No hay consulta aún.</div>
+              <div class="min-h-[160px] max-h-[200px] overflow-y-auto font-mono text-xs bg-white rounded shadow p-2 border border-slate-200 w-full">No hay consulta aún.</div>
             </div>
           </div>
+          <form id="chat-ia-form" hx-post="/api/chat/ask" hx-target="#chat-ia-panel" hx-swap="innerHTML" class="w-full flex flex-col gap-2 mt-0">
+            <textarea name="prompt" required placeholder="Escribe tu pregunta o prompt..." class="border rounded p-2 w-full min-h-[40px] text-xs focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+            <button type="submit" class="bg-blue-700 text-white px-2 py-2 rounded hover:bg-blue-800 transition min-w-[100px] w-full text-xs font-semibold">Enviar</button>
+            <input type="hidden" name="contexto" id="chat-contexto-markdown" value="">
+          </form>
         </div>
-        <form id="chat-ia-form" hx-post="/api/chat/ask" hx-target="#chat-ia-panel" hx-swap="innerHTML" class="flex flex-col gap-2 w-full mt-8">
-          <textarea name="prompt" required placeholder="Escribe tu pregunta o prompt..." class="border rounded p-2 w-full min-h-[40px] text-xs focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
-          <input type="hidden" name="contexto" id="chat-contexto-markdown" value="">
-          <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition min-w-[180px] w-full text-sm font-semibold">Enviar</button>
-        </form>
-        <script>
-        // Siempre añade el contenido actual del editor Markdown como contexto antes de enviar el prompt
-        document.addEventListener('htmx:configRequest', function(evt) {
-          if (evt.detail.elt && evt.detail.elt.id === 'chat-ia-form') {
-            // Busca el textarea del editor markdown en toda la página
-            var markdown = document.querySelector('#markdown-editor-content');
-            var contextoInput = evt.detail.elt.querySelector('input[name="contexto"]');
-            if (markdown && contextoInput) {
-              contextoInput.value = markdown.value;
-            } else {
-              contextoInput.value = '';
-            }
-          }
-        });
-        </script>
       </div>
     </section>
   </div>
 </div>
+<script>
+  // Vacía el prompt y la respuesta IA al pulsar 'Generar Funcional'
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('generar-funcional-btn');
+    if (btn) {
+      btn.addEventListener('click', function() {
+        // Vacía el prompt
+        const prompt = document.querySelector('#chat-ia-form textarea[name="prompt"]');
+        if (prompt) prompt.value = '';
+        // Vacía la respuesta IA
+        const panel = document.getElementById('chat-ia-panel');
+        if (panel) panel.innerHTML = '<div class="min-h-[340px] max-h-[420px] overflow-y-auto font-mono text-xs bg-white rounded shadow p-2 border border-slate-200 w-full text-gray-400 italic">No hay consulta aún.</div>';
+      });
+    }
+  });
+</script>
 {% endblock %}

@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.responses import JSONResponse
 from app.api.chat_sugerencias import generar_sugerencias
 from app.services.chat_ia_service import chat_ia_azure_openai
-from app.services.markdown_funcional_service import get_markdown_funcional
+from app.services.markdown_funcional_service import get_markdown_funcional_from_db
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -18,10 +18,10 @@ async def chat_ia_ask(request: Request, prompt: str = Form(...), contexto: str =
     global ultimo_prompt, ultima_respuesta
     ultimo_prompt = prompt
 
-    # Obtener el contenido del documento funcional desde el servicio
-    markdown_context = get_markdown_funcional()
+    # Obtener el contenido del documento funcional desde la base de datos
+    markdown_context = await get_markdown_funcional_from_db()
     if not markdown_context.strip():
-        print("[ADVERTENCIA] El documento funcional está vacío o no se pudo cargar.")
+        print("[ADVERTENCIA] El documento funcional está vacío o no se pudo cargar desde la BBDD.")
     else:
         print(f"[DEBUG] Longitud del documento funcional enviado como contexto: {len(markdown_context)} caracteres")
 

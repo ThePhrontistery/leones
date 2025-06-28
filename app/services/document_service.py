@@ -11,7 +11,7 @@ from app.models.document import UploadedDocument
 from app.db.models import UploadedFile
 from app.db.session import AsyncSessionLocal
 from app.utils.parse_template import parse_template_sections
-from app.utils.file_text import extract_text_from_file
+from app.utils.file_text import extract_text_from_file, extract_text_from_pdf
 from app.services.document_store import get_documents
 from app.config import settings
 

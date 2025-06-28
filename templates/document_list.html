@@ -1,13 +1,13 @@
 {% if documents %}
 <ul class="divide-y divide-slate-200">
   {% for doc in documents %}
-  <li class="py-2 flex flex-col items-center">
-    <div class="flex flex-col items-center w-full">
-      <span class="font-semibold text-blue-800 text-[9px]">{{ doc.file_name }}</span>
-      <span class="text-[9px] text-slate-500">{{ doc.categoria }} | {{ doc.fecha_carga }}</span>
-      <span class="text-[9px] text-slate-400">{{ doc.descripcion or '—' }}</span>
+  <li class="py-2 flex flex-col items-start">
+    <div class="flex flex-col items-start w-full">
+      <span class="font-semibold text-blue-800 text-[9px] break-all text-left w-full">{{ doc.file_name }}</span>
+      <span class="text-[9px] text-slate-500 text-left w-full">{{ doc.categoria }} | {{ doc.fecha_carga }}</span>
+      <span class="text-[9px] text-slate-400 text-left w-full">{{ doc.descripcion or '—' }}</span>
     </div>
-    <form hx-post="/api/document/delete/{{ doc.file_name }}" hx-target="#document-list" hx-swap="innerHTML" hx-trigger="click" class="mt-2 flex justify-center w-full">
+    <form hx-post="/api/document/delete/{{ doc.file_name }}" hx-target="#document-list" hx-swap="innerHTML" hx-trigger="click" class="mt-2 flex justify-start w-full">
       <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded text-[9px] font-semibold hover:bg-red-700 transition">Borrar</button>
     </form>
   </li>

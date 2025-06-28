@@ -2,6 +2,9 @@
 Servicio para obtener el contenido actual del documento funcional en edición (Markdown).
 """
 import os
+from app.db.session import get_async_session
+from app.db.markdown import get_markdown_document
+import asyncio
 
 def get_markdown_funcional() -> str:
     """
@@ -27,3 +30,14 @@ def get_markdown_funcional() -> str:
 
     # Si no se encuentra contenido, devolver una advertencia
     return "[ADVERTENCIA] No se encontró contenido funcional para enviar como contexto."
+
+async def get_markdown_funcional_from_db() -> str:
+    """
+    Obtiene el contenido markdown del documento funcional desde la base de datos.
+    Devuelve una advertencia si no se encuentra.
+    """
+    async for session in get_async_session():
+        doc = await get_markdown_document(session)
+        if doc and doc.content.strip():
+            return doc.content
+    return "[ADVERTENCIA] No se encontró contenido funcional en la base de datos."

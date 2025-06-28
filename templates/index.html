@@ -30,17 +30,6 @@
         </div>
         <div class="bg-white rounded-lg shadow p-2 mb-2 flex flex-col items-stretch w-full mx-auto" style="min-height:340px; max-height:420px;">
           <div id="document-list" hx-get="/api/document/list" hx-trigger="load,documentUploaded from:body,documentDeleted from:body" hx-swap="innerHTML" class="text-[9px] overflow-y-auto flex-1"></div>
-          <div class="flex flex-row gap-1 mt-2 justify-center w-full">
-            <button
-              type="button"
-              hx-post="/api/document/clear"
-              hx-target="#document-list"
-              hx-swap="innerHTML"
-              class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition min-w-[90px] text-xs font-semibold"
-            >
-              Borrar todos
-            </button>
-          </div>
         </div>
         <div class="flex flex-row gap-1 mt-12 justify-start">
           <button
@@ -159,13 +148,37 @@
   document.addEventListener('DOMContentLoaded', function() {
     const btn = document.getElementById('generar-funcional-btn');
     if (btn) {
-      btn.addEventListener('click', function() {
+      btn.addEventListener('click', function(e) {
+        var docList = document.getElementById('document-list');
+        var panel = document.getElementById('chat-ia-panel');
+        // Si no hay documentos cargados, previene cualquier petición y muestra el mensaje en la IA
+        if (docList && docList.innerText.match(/no hay documentos cargados/i)) {
+          e.preventDefault();
+          e.stopPropagation();
+          // Vacía el prompt
+          var prompt = document.querySelector('#chat-ia-form textarea[name="prompt"]');
+          if (prompt) prompt.value = '';
+          // Elimina todo el contenido del panel de la IA
+          if (panel) {
+            var msg = document.createElement('div');
+            msg.className = 'min-h-[160px] max-h-[200px] overflow-y-auto font-mono text-xs bg-white rounded shadow p-2 border border-slate-200 w-full';
+            msg.textContent = 'No hay consulta aún.';
+            panel.appendChild(msg);
+          }
+          return false;
+        }
         // Vacía el prompt
-        const prompt = document.querySelector('#chat-ia-form textarea[name="prompt"]');
+        var prompt = document.querySelector('#chat-ia-form textarea[name="prompt"]');
         if (prompt) prompt.value = '';
         // Vacía la respuesta IA
-        const panel = document.getElementById('chat-ia-panel');
-        if (panel) panel.innerHTML = '<div class="min-h-[340px] max-h-[420px] overflow-y-auto font-mono text-xs bg-white rounded shadow p-2 border border-slate-200 w-full text-gray-400 italic">No hay consulta aún.</div>';
+        const historial = document.getElementById('chat-ia-historial');
+        const docList = document.getElementById('document-list');
+        // Si no hay documentos cargados, vacía la caja IA y muestra el mensaje adecuado
+        if (docList && docList.innerText.match(/no hay documentos cargados/i)) {
+          if (historial) {
+            historial.innerHTML = '<div class="min-h-[160px] max-h-[200px] overflow-y-auto font-mono text-xs bg-white rounded shadow p-2 border border-slate-200 w-full">No hay consulta aún.</div>';
+          }
+        }
       });
     }
   });

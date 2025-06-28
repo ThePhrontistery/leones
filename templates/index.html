@@ -1,46 +1,48 @@
 {% extends "base.html" %}
 {% block content %}
 <script type="module" src="/static/generar_funcional.js"></script>
-<div class="w-full min-h-screen h-screen flex flex-col justify-center items-center p-0 m-0 overflow-hidden">
-  <div class="grid grid-cols-1 md:grid-cols-12 gap-4 w-full h-full max-h-full">
+<div class="w-screen h-screen flex flex-col p-0 m-0 overflow-hidden">
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-2 w-full flex-1 max-h-full">
     <!-- Primera columna: Carga de documentos -->
-    <section class="col-span-1 bg-slate-50 rounded-2xl p-3 shadow-lg border border-slate-200 flex flex-col h-full min-h-0">
-      <h3 class="font-semibold text-base text-blue-700 mb-2">
-        Carga de documentos
-      </h3>
+    <section class="col-span-1 md:col-span-2 bg-slate-50 rounded-2xl p-2 shadow-lg border border-slate-200 flex flex-col h-full min-h-0 overflow-hidden">
+      <h3 class="font-bold text-xl text-blue-700 mb-2">Carga de documentos</h3>
       <div
         id="panel-upload"
-        class="flex flex-col items-stretch gap-1 text-slate-400"
+        class="flex flex-col items-stretch gap-1 text-slate-400 overflow-hidden flex-1 mt-2"
       >
-        <div class="flex flex-row gap-1 mb-1 justify-start">
+        <div class="flex flex-row gap-1 mb-2 justify-start">
           <button
             type="button"
-            onclick="window.open('/api/document/upload', '_blank', 'width=500,height=600')"
-            class="bg-blue-700 text-white px-2 py-1 rounded hover:bg-blue-800 transition min-w-[120px] text-xs"
+            onclick="(function(){
+              const w=520, h=600;
+              const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+              const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
+              const width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+              const height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+              const left = ((width - w) / 2) + dualScreenLeft;
+              const top = ((height - h) / 2) + dualScreenTop;
+              window.open('/api/document/upload', '_blank', `width=${w},height=${h},top=${top},left=${left},resizable=yes,scrollbars=yes`);
+            })()"
+            class="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800 transition min-w-[140px] text-xs font-semibold"
           >
             Abrir carga de documentos
           </button>
         </div>
-        <div id="upload-result" class="mt-1"></div>
-        <div
-          id="document-list"
-          hx-get="/api/document/list"
-          hx-trigger="load,documentUploaded from:body"
-          hx-swap="innerHTML"
-          class="mt-1 text-xs"
-        ></div>
-        <div class="flex flex-row gap-1 mt-2 justify-start">
-          <button
-            type="button"
-            hx-post="/api/document/clear"
-            hx-target="#document-list"
-            hx-swap="innerHTML"
-            class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition min-w-[120px] text-xs"
-          >
-            Borrar todos
-          </button>
+        <div class="bg-white rounded-lg shadow p-2 mb-2 flex flex-col items-stretch w-[90%] mx-auto" style="min-height:180px; max-height:260px;">
+          <div id="document-list" hx-get="/api/document/list" hx-trigger="load,documentUploaded from:body,documentDeleted from:body" hx-swap="innerHTML" class="text-[9px] overflow-y-auto flex-1"></div>
+          <div class="flex flex-row gap-1 mt-2 justify-center">
+            <button
+              type="button"
+              hx-post="/api/document/clear"
+              hx-target="#document-list"
+              hx-swap="innerHTML"
+              class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition min-w-[90px] text-xs font-semibold"
+            >
+              Borrar todos
+            </button>
+          </div>
         </div>
-        <div class="flex flex-row gap-1 mt-1 justify-start">
+        <div class="flex flex-row gap-1 mt-12 justify-start">
           <button
             id="generar-funcional-btn"
             type="button"
@@ -48,7 +50,7 @@
             hx-target="#panel-markdown"
             hx-swap="innerHTML"
             hx-indicator="#generar-funcional-indicador"
-            class="bg-green-700 text-white px-2 py-1 rounded hover:bg-green-800 transition min-w-[120px] text-xs"
+            class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 transition min-w-[180px] text-sm font-semibold mt-2"
             onclick="mostrarReloj()"
           >
             Generar Funcional
@@ -59,34 +61,34 @@
     </section>
 
     <!-- Segunda columna: Panel Análisis funcional con 3 secciones horizontales -->
-    <section class="col-span-8 bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col h-full min-h-0">
-      <h3 class="font-semibold text-xl text-blue-700 mb-4">Análisis funcional</h3>
-      <div id="panel-markdown" class="flex flex-row gap-4 w-full h-full max-h-full">
+    <section class="col-span-1 md:col-span-8 bg-slate-50 rounded-2xl p-2 shadow-lg border border-slate-200 flex flex-col h-full min-h-0 overflow-hidden">
+      <h3 class="font-bold text-xl text-blue-700 mb-2">Análisis funcional</h3>
+      <div id="panel-markdown" class="flex flex-row gap-2 w-full h-full max-h-full overflow-hidden">
         <!-- Sección 1: Árbol de Contenidos -->
-        <div class="flex flex-col min-h-0 h-full max-w-[180px]">
-          <div class="bg-white rounded-lg shadow p-4 flex-1 flex flex-col">
-            <div class="font-semibold text-blue-700 mb-2">Árbol de contenidos</div>
-            <div id="panel-tree" class="flex-1 flex items-start justify-start text-slate-400">
+        <div class="flex flex-col min-h-0 h-full max-w-[140px] overflow-hidden">
+          <div class="bg-white rounded-lg shadow p-2 flex-1 flex flex-col overflow-hidden">
+            <div class="font-bold text-blue-700 mb-2 text-sm">Árbol de contenidos</div>
+            <div id="panel-tree" class="flex-1 flex items-start justify-start text-slate-400 overflow-y-auto text-[10px] h-full" style="max-height:100%; min-height:0;">
               <div id="arbol-contenidos" hx-get="/api/document/arbol-contenidos" hx-trigger="load" hx-swap="innerHTML"></div>
             </div>
           </div>
         </div>
         <!-- Sección 2: Editor Markdown -->
-        <div class="flex-1 flex flex-col min-h-0 h-full max-w-full">
-          <div class="bg-white rounded-lg shadow p-4 flex-1 flex flex-col items-center">
-            <div class="font-semibold text-blue-700 mb-2 flex flex-row items-center justify-between gap-2 w-full">
+        <div class="flex-1 flex flex-col min-h-0 h-full max-w-full overflow-hidden">
+          <div class="bg-white rounded-lg shadow p-2 flex-1 flex flex-col items-center overflow-hidden">
+            <div class="font-bold text-blue-700 mb-2 flex flex-row items-center justify-between gap-2 w-full text-sm">
               <span>Editor Markdown</span>
               <div class="flex flex-row gap-2 items-center">
-                <button id="guardar-markdown-btn" class="bg-blue-600 text-white px-4 py-1 text-xs rounded hover:bg-blue-700 transition min-w-[120px]">Guardar cambios</button>
-                <button id="exportar-markdown-btn" class="bg-green-600 text-white px-2 py-1 text-xs rounded hover:bg-green-700 transition">Exportar</button>
+                <button id="guardar-markdown-btn" class="bg-blue-600 text-white px-2 py-2 text-sm font-semibold rounded hover:bg-blue-700 transition min-w-[90px] mr-2">Guardar</button>
+                <button id="exportar-markdown-btn" class="bg-green-600 text-white px-2 py-2 text-sm font-semibold rounded hover:bg-green-700 transition min-w-[90px]">Exportar</button>
                 <select id="exportar-formato" class="px-1 py-1 rounded border border-slate-300 text-[10px] w-14 focus:outline-none focus:ring-2 focus:ring-blue-400">
                   <option value="word">Word</option>
                   <option value="pdf" disabled>PDF (próximamente)</option>
                 </select>
               </div>
             </div>
-            <div id="markdown-editor" class="flex-1 mb-4 w-full flex justify-center">
-              <div class="w-full max-w-[54ch] ml-[-16px]">
+            <div id="markdown-editor" class="flex-1 mb-2 w-full flex justify-center overflow-hidden">
+              <div class="w-full max-w-[44ch] ml-[-8px]">
                 <textarea id="markdown-editor-content" class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-1 rounded border border-slate-200 overflow-x-auto overflow-y-auto h-full min-h-0 w-full resize-none focus:outline-none focus:ring-2 focus:ring-blue-400" spellcheck="false">{{ markdown_content }}</textarea>
               </div>
               <div id="guardar-msg" class="mt-2 text-sm"></div>
@@ -119,11 +121,11 @@
           </div>
         </div>
         <!-- Sección 3: Vista previa -->
-        <div class="flex-1 flex flex-col min-h-0 h-full max-w-full">
-          <div class="bg-white rounded-lg shadow p-4 flex-1 flex flex-col items-center">
-            <div class="font-semibold text-blue-700 mb-2 w-full">Vista previa</div>
-            <div id="markdown-preview-wrapper" class="w-full flex justify-center mt-8">
-              <div id="markdown-preview" class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-1 rounded border border-slate-200 overflow-y-auto h-full min-h-0 w-full max-w-[45ch] resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 prose max-w-none text-sm">{{ vista_previa | safe }}</div>
+        <div class="flex-1 flex flex-col min-h-0 h-full max-w-full overflow-hidden">
+          <div class="bg-white rounded-lg shadow p-2 flex-1 flex flex-col items-center overflow-hidden" style="height:100%; min-height:0;">
+            <div class="font-bold text-blue-700 mb-2 w-full text-sm">Vista previa</div>
+            <div id="markdown-preview-wrapper" class="w-full flex justify-center mt-2 overflow-hidden h-full">
+              <div id="markdown-preview" class="whitespace-pre-wrap font-mono text-sm bg-slate-50 p-1 rounded border border-slate-200 overflow-y-auto h-full min-h-0 w-full max-w-[36ch] resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 prose max-w-none text-sm" style="height:100%; max-height:100%;">{{ vista_previa | safe }}</div>
             </div>
           </div>
         </div>
@@ -131,24 +133,24 @@
     </section>
 
     <!-- Tercera columna: Chat lateral con IA -->
-    <section class="col-span-2 bg-slate-50 rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col h-full min-h-0">
-      <h3 class="font-semibold text-xl text-blue-700 mb-4">Chat IA (Agent)</h3>
+    <section class="col-span-1 md:col-span-2 bg-slate-50 rounded-2xl p-2 shadow-lg border border-slate-200 flex flex-col h-full min-h-0 overflow-hidden">
+      <h3 class="font-bold text-xl text-blue-700 mb-2">ChatBot IA</h3>
       <div
         id="panel-chat"
-        class="flex-1 flex flex-col items-center justify-center text-slate-400"
+        class="flex-1 flex flex-col items-center text-slate-400 overflow-hidden justify-start"
       >
-        <!-- Vacío al inicio -->
-        <!-- Sección superior: prompt enviado y respuesta IA -->
-        <div id="chat-ia-panel" class="w-full mb-0">
-          <div id="chat-ia-historial" hx-get="/api/chat/ultimo" hx-trigger="load,chatActualizado from:body" hx-target="#chat-ia-panel" hx-swap="innerHTML">
-            <div class="min-h-[220px] max-h-[400px] overflow-y-auto text-base bg-white rounded shadow p-4 border border-slate-200">No hay consulta aún.</div>
+        <div class="w-full flex flex-col gap-2 mt-0">
+          <div class="font-bold text-blue-700 text-xs mb-1">Respuesta IA:</div>
+          <div id="chat-ia-panel" class="w-full overflow-x-auto" style="max-width:100%; max-height:200px;">
+            <div id="chat-ia-historial" hx-get="/api/chat/ultimo" hx-trigger="load,chatActualizado from:body" hx-target="#chat-ia-panel" hx-swap="innerHTML">
+              <div class="min-h-[120px] max-h-[200px] overflow-y-auto font-mono text-xs bg-white rounded shadow p-2 border border-slate-200">No hay consulta aún.</div>
+            </div>
           </div>
         </div>
-        <!-- Sección inferior: campo de texto y botón enviar -->
-        <form id="chat-ia-form" hx-post="/api/chat/ask" hx-target="#chat-ia-panel" hx-swap="innerHTML" class="flex flex-col gap-4 w-full">
-          <textarea name="prompt" required placeholder="Escribe tu pregunta o prompt..." class="border rounded p-2 w-full min-h-[60px] focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+        <form id="chat-ia-form" hx-post="/api/chat/ask" hx-target="#chat-ia-panel" hx-swap="innerHTML" class="flex flex-col gap-2 w-full mt-8">
+          <textarea name="prompt" required placeholder="Escribe tu pregunta o prompt..." class="border rounded p-2 w-full min-h-[40px] text-xs focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
           <input type="hidden" name="contexto" id="chat-contexto-markdown" value="">
-          <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition">Enviar</button>
+          <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition min-w-[180px] w-full text-sm font-semibold">Enviar</button>
         </form>
         <script>
         // Siempre añade el contenido actual del editor Markdown como contexto antes de enviar el prompt

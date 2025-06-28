@@ -16,16 +16,14 @@
   </head>
   <body class="bg-gradient-to-br from-slate-100 to-blue-100 min-h-screen w-screen">
     <div class="w-full h-screen flex flex-col">
-      <header class="mb-6 py-6 bg-white/80 shadow flex items-center justify-between px-8">
-        <h1 class="text-3xl font-bold text-blue-700 drop-shadow-sm">
+      <header class="mb-2 py-2 bg-white/80 shadow flex items-center justify-between px-6">
+        <h1 class="text-2xl font-bold text-blue-700 drop-shadow-sm">
           {{ title or "Metasketch" }}
         </h1>
         <nav class="flex items-center space-x-4">
-          <a href="/" class="text-blue-700 hover:underline">Inicio</a>
-          <a href="/chat/sugerencias" class="text-blue-700 hover:underline">Chat IA (Agent)</a>
           {% if user %}
           <span class="text-blue-800 font-semibold">Bienvenido, {{ user }} 👋</span>
-          <a href="/logout" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 transition">Logout</a>
+          <a href="/logout" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 transition">Salir</a>
           {% endif %}
         </nav>
       </header>

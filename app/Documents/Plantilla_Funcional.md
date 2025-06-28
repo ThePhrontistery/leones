@@ -12,9 +12,3 @@
 # 5. Flujos de funcionamiento/Casos de Uso
 # 6. Criterios de Aceptación
 # 7. Interfaces del Sistema
-# 8. Mockups/Prototipos
-# 9. Guía de estilo
-# 10. Documentación
-# 11. Anexos
-## 11.1. Glosario
-## 11.2. Sketchs usuario

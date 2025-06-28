@@ -160,3 +160,22 @@ async def mostrar_funcional(request: Request, section: str = Query(None)):
     except Exception as e:
         logger.exception("Error en /api/document/funcional")
         return HTMLResponse(f"<div class='text-red-600'>Error: {str(e)}</div>", status_code=500)
+
+@router.post("/delete/{file_name}", response_class=HTMLResponse)
+async def delete_document(request: Request, file_name: str):
+    """
+    Borra un documento individual por nombre de archivo.
+    """
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(UploadedFile).where(UploadedFile.filename == file_name))
+        file = result.scalar_one_or_none()
+        if file:
+            try:
+                if os.path.exists(file.file_path):
+                    os.remove(file.file_path)
+            except Exception:
+                pass
+            await session.delete(file)
+            await session.commit()
+    docs = await get_documents()
+    return templates.TemplateResponse("document_list.html", {"request": request, "documents": docs})

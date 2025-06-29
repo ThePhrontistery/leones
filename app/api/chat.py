@@ -5,6 +5,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from app.services.chat_service import saludar_ia
+from app.services.document_store import get_documents
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 templates = Jinja2Templates(directory="templates")
@@ -28,8 +29,13 @@ async def chat_ultimo(request: Request):
         return HTMLResponse(
             '<div class="min-h-[160px] max-h-[200px] overflow-y-auto font-mono text-xs bg-white rounded shadow p-2 border border-slate-200 w-full">No hay consulta aún.</div>'
         )
-    # Aquí iría la lógica para obtener y mostrar el último mensaje
-    ultimo_doc = docs[-1]  # Suponiendo que docs es una lista y queremos el último
+    # Validar que el último documento tenga un mensaje legible
+    ultimo_doc = docs[-1]
+    # Si el documento no es un string, mostrar mensaje amigable
+    if not isinstance(ultimo_doc, str):
+        return HTMLResponse(
+            '<div class="min-h-[160px] max-h-[200px] overflow-y-auto font-mono text-xs bg-white rounded shadow p-2 border border-red-200 text-red-700 w-full">No hay mensajes de chat disponibles aún.</div>'
+        )
     return templates.TemplateResponse(
         "chat_result.html", {"request": request, "resultado": ultimo_doc}
     )

@@ -9,6 +9,6 @@
 ### 4.2.2. Seguridad
 ### 4.2.3. Usabilidad
 ### 4.2.4. Compatibilidad
-# 5. Flujos de funcionamiento/Casos de Uso
+# 5. Flujos de funcionamiento-Casos de Uso
 # 6. Criterios de Aceptación
 # 7. Interfaces del Sistema

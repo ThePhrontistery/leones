@@ -176,30 +176,34 @@ async def markdown_to_pdf(markdown_text: str) -> bytes:
             safe_multicell(pdf, 7, texto)
             pdf.set_font("Arial", size=12)
         elif tipo == "ul" or tipo == "ol":
-            pdf.cell(8)
+            bullet = "-"  # Siempre ASCII seguro
             for subline in texto.split("\n"):
                 clean_text = subline.strip()
+                clean_text = asciify(clean_text)
                 clean_text = clean_ascii(clean_text)
                 if not clean_text or len(clean_text.replace('-', '').replace(' ', '')) < 2:
-                    try:
-                        pdf.cell(0, 7, "- item seguro de lista", ln=1)
-                    except Exception:
-                        pdf.multi_cell(0, 7, "- item seguro de lista")
+                    pdf.set_x(pdf.l_margin + 8)
+                    pdf.multi_cell(0, 7, f"- item seguro de lista")
                     continue
-                # Divide en líneas de máximo 90 caracteres para evitar errores de ancho
-                maxlen = 90
-                lines = [clean_text[i:i+maxlen] for i in range(0, len(clean_text), maxlen)]
-                for idx, line in enumerate(lines):
-                    try:
-                        if len(line) < maxlen:
-                            pdf.cell(0, 7, f"- {line}", ln=1)
-                        else:
-                            pdf.multi_cell(0, 7, f"- {line}")
-                    except Exception:
-                        try:
-                            pdf.multi_cell(0, 7, f"- {line}")
-                        except Exception:
-                            pdf.cell(0, 7, "- item seguro de lista", ln=1)
+                # Procesa negrita en el ítem
+                bold_parts = re.split(r'(\*\*[^*]+\*\*)', clean_text)
+                pdf.set_x(pdf.l_margin + 8)  # Sangría para listas
+                first = True
+                for part in bold_parts:
+                    part = asciify(part)
+                    part = clean_ascii(part)
+                    if first:
+                        prefix = "- "
+                        first = False
+                    else:
+                        prefix = ""
+                    if part.startswith('**') and part.endswith('**'):
+                        pdf.set_font("Arial", "B", 12)
+                        pdf.write(7, prefix + part[2:-2])
+                        pdf.set_font("Arial", size=12)
+                    else:
+                        pdf.write(7, prefix + part)
+                pdf.ln(7)
         elif tipo == "p":
             # Soporte negrita básica: **texto**
             bold_parts = re.split(r'(\*\*[^*]+\*\*)', texto)

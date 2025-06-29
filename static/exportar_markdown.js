@@ -1,5 +1,5 @@
 // static/exportar_markdown.js
-// Gestiona la exportación del markdown a Word usando HTMX
+// Nueva funcionalidad: exportar markdown a Word
 
 document.addEventListener("DOMContentLoaded", () => {
   const exportBtn = document.getElementById("exportar-markdown-btn");
@@ -13,9 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
       exportBtn.textContent = "Exportando...";
       try {
         const formData = new FormData();
-        formData.append("markdown_content", editor.value); // <-- nombre correcto
-        formData.append("formato", formatoCombo.value);    // <-- nombre correcto
-        const response = await fetch("/api/generar-funcional/exportar", {
+        formData.append("markdown_text", editor.value);
+        formData.append("format", formatoCombo.value);
+        const response = await fetch("/api/export/", {
           method: "POST",
           body: formData,
         });

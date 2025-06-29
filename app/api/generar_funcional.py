@@ -84,50 +84,50 @@ async def guardar_funcional(request: Request, markdown_content: str = Form(...),
         logger.exception("Error al guardar el funcional editado")
         return HTMLResponse(f'<div class="text-red-600">Error: {str(e)}</div>', status_code=500)
 
-@router.post("/exportar")
-async def exportar_funcional(
-    markdown_content: str = Form(...),
-    formato: str = Form(...)
-):
-    """
-    Exporta el markdown guardado (si existe) o el contenido recibido como Word o PDF.
-    """
-    try:
-        temp_path = "/tmp/funcional_guardado.md"
-        use_temp = False
-        if os.path.exists(temp_path):
-            with open(temp_path, encoding="utf-8") as f:
-                contenido = f.read()
-            # Si el archivo temporal está vacío, usar el contenido recibido
-            if contenido.strip():
-                use_temp = True
-            else:
-                contenido = markdown_content
-        else:
-            contenido = markdown_content
-        # Exportar a Word
-        if formato == "word":
-            from docx import Document
-            doc = Document()
-            for line in contenido.splitlines():
-                doc.add_paragraph(line)
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp:
-                doc.save(tmp.name)
-                tmp.seek(0)
-                return FileResponse(tmp.name, filename="funcional.docx", media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-        # Exportar a PDF
-        elif formato == "pdf":
-            import markdown as md
-            html = md.markdown(contenido)
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                # pdfkit.from_string(html, tmp.name)  # Comentado para evitar error de importación
-                tmp.seek(0)
-                return FileResponse(tmp.name, filename="funcional.pdf", media_type="application/pdf")
-        else:
-            return JSONResponse({"success": False, "message": "Formato no soportado"}, status_code=400)
-    except Exception as e:
-        logger.exception("Error al exportar el funcional")
-        return JSONResponse({"success": False, "message": str(e)}, status_code=500)
+# [EXPORTAR_WORD_COMENTADO] @router.post("/exportar")
+# [EXPORTAR_WORD_COMENTADO] async def exportar_funcional(
+# [EXPORTAR_WORD_COMENTADO]     markdown_content: str = Form(...),
+# [EXPORTAR_WORD_COMENTADO]     formato: str = Form(...)
+# [EXPORTAR_WORD_COMENTADO] ):
+# [EXPORTAR_WORD_COMENTADO]     """
+# [EXPORTAR_WORD_COMENTADO]     Exporta el markdown guardado (si existe) o el contenido recibido como Word o PDF.
+# [EXPORTAR_WORD_COMENTADO]     """
+# [EXPORTAR_WORD_COMENTADO]     try:
+# [EXPORTAR_WORD_COMENTADO]         temp_path = "/tmp/funcional_guardado.md"
+# [EXPORTAR_WORD_COMENTADO]         use_temp = False
+# [EXPORTAR_WORD_COMENTADO]         if os.path.exists(temp_path):
+# [EXPORTAR_WORD_COMENTADO]             with open(temp_path, encoding="utf-8") as f:
+# [EXPORTAR_WORD_COMENTADO]                 contenido = f.read()
+# [EXPORTAR_WORD_COMENTADO]             # Si el archivo temporal está vacío, usar el contenido recibido
+# [EXPORTAR_WORD_COMENTADO]             if contenido.strip():
+# [EXPORTAR_WORD_COMENTADO]                 use_temp = True
+# [EXPORTAR_WORD_COMENTADO]             else:
+# [EXPORTAR_WORD_COMENTADO]                 contenido = markdown_content
+# [EXPORTAR_WORD_COMENTADO]         else:
+# [EXPORTAR_WORD_COMENTADO]             contenido = markdown_content
+# [EXPORTAR_WORD_COMENTADO]         # Exportar a Word
+# [EXPORTAR_WORD_COMENTADO]         if formato == "word":
+# [EXPORTAR_WORD_COMENTADO]             from docx import Document
+# [EXPORTAR_WORD_COMENTADO]             doc = Document()
+# [EXPORTAR_WORD_COMENTADO]             for line in contenido.splitlines():
+# [EXPORTAR_WORD_COMENTADO]                 doc.add_paragraph(line)
+# [EXPORTAR_WORD_COMENTADO]             with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp:
+# [EXPORTAR_WORD_COMENTADO]                 doc.save(tmp.name)
+# [EXPORTAR_WORD_COMENTADO]                 tmp.seek(0)
+# [EXPORTAR_WORD_COMENTADO]                 return FileResponse(tmp.name, filename="funcional.docx", media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+# [EXPORTAR_WORD_COMENTADO]         # Exportar a PDF
+# [EXPORTAR_WORD_COMENTADO]         elif formato == "pdf":
+# [EXPORTAR_WORD_COMENTADO]             import markdown as md
+# [EXPORTAR_WORD_COMENTADO]             html = md.markdown(contenido)
+# [EXPORTAR_WORD_COMENTADO]             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+# [EXPORTAR_WORD_COMENTADO]                 # pdfkit.from_string(html, tmp.name)  # Comentado para evitar error de importación
+# [EXPORTAR_WORD_COMENTADO]                 tmp.seek(0)
+# [EXPORTAR_WORD_COMENTADO]                 return FileResponse(tmp.name, filename="funcional.pdf", media_type="application/pdf")
+# [EXPORTAR_WORD_COMENTADO]         else:
+# [EXPORTAR_WORD_COMENTADO]             return JSONResponse({"success": False, "message": "Formato no soportado"}, status_code=400)
+# [EXPORTAR_WORD_COMENTADO]     except Exception as e:
+# [EXPORTAR_WORD_COMENTADO]         logger.exception("Error al exportar el funcional")
+# [EXPORTAR_WORD_COMENTADO]         return JSONResponse({"success": False, "message": str(e)}, status_code=500)
 
 @router.get("/loading", response_class=HTMLResponse)
 async def loading_panel(request: Request):

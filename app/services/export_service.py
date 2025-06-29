@@ -45,13 +45,18 @@ async def markdown_to_docx(markdown_text: str) -> BytesIO:
     # Salto de página tras la TOC
     doc.add_page_break()
 
+    def clean_heading(text: str) -> str:
+        # Elimina patrones tipo {#...} al final del texto
+        import re
+        return re.sub(r'\s*\{#.*?\}\s*$', '', text).strip()
+
     def add_element(element: Any):
         if element.name == "h1":
-            doc.add_heading(element.get_text(), level=1)
+            doc.add_heading(clean_heading(element.get_text()), level=1)
         elif element.name == "h2":
-            doc.add_heading(element.get_text(), level=2)
+            doc.add_heading(clean_heading(element.get_text()), level=2)
         elif element.name == "h3":
-            doc.add_heading(element.get_text(), level=3)
+            doc.add_heading(clean_heading(element.get_text()), level=3)
         elif element.name == "ul":
             for li in element.find_all("li", recursive=False):
                 doc.add_paragraph(li.get_text(), style="List Bullet")
@@ -62,12 +67,12 @@ async def markdown_to_docx(markdown_text: str) -> BytesIO:
             p = doc.add_paragraph()
             for child in element.children:
                 if getattr(child, "name", None) == "strong":
-                    run = p.add_run(child.get_text())
+                    run = p.add_run(clean_heading(child.get_text()))
                     run.bold = True
                 else:
                     p.add_run(str(child))
         elif element.name == "strong":
-            run = doc.add_paragraph().add_run(element.get_text())
+            run = doc.add_paragraph().add_run(clean_heading(element.get_text()))
             run.bold = True
         elif element.name is None:
             doc.add_paragraph(element)

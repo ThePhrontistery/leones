@@ -6,10 +6,13 @@ from typing import Optional
 import os
 import markdown
 import re
+import base64
+from PIL import Image
+import io
 
 async def extract_text_from_file(file_path: str) -> Optional[str]:
     """
-    Extrae texto de archivos .txt, .md, .pdf, .docx. Ignora imágenes si no hay OCR disponible.
+    Extrae texto de archivos .txt, .md, .pdf, .docx. Si es imagen, devuelve None (no error).
     Devuelve errores detallados para depuración.
     """
     import traceback
@@ -19,12 +22,6 @@ async def extract_text_from_file(file_path: str) -> Optional[str]:
             with open(file_path, "r", encoding="utf-8") as f:
                 return f.read()
         elif ext == ".pdf":
-            # try:
-            #     import pdfplumber
-            # except ImportError:
-            #     return "[ERROR] Falta pdfplumber para leer PDF."
-            # with pdfplumber.open(file_path) as pdf:
-            #     return "\n".join(page.extract_text() or "" for page in pdf.pages)
             from .file_text import extract_text_from_pdf
             return extract_text_from_pdf(file_path)
         elif ext == ".docx":
@@ -37,6 +34,9 @@ async def extract_text_from_file(file_path: str) -> Optional[str]:
                 return "\n".join([p.text for p in doc.paragraphs])
             except Exception as e:
                 return f"[ERROR] python-docx no pudo leer el archivo: {e}\n{traceback.format_exc()}"
+        elif ext in {".jpg", ".jpeg", ".png"}:
+            # Es imagen, no extraer texto ni devolver error
+            return None
         else:
             return f"[ERROR] Formato no soportado: {ext}"
     except Exception as e:
@@ -63,14 +63,6 @@ def extract_text_from_pdf(pdf_path: str) -> str:
     Extrae el texto de un archivo PDF usando pypdf (puro Python).
     Devuelve el texto concatenado de todas las páginas.
     """
-    # import pdfplumber
-    # text = []
-    # with pdfplumber.open(pdf_path) as pdf:
-    #     for page in pdf.pages:
-    #         page_text = page.extract_text()
-    #         if page_text:
-    #             text.append(page_text)
-    # return "\n".join(text)
     from pypdf import PdfReader
     text = []
     reader = PdfReader(pdf_path)
@@ -79,3 +71,20 @@ def extract_text_from_pdf(pdf_path: str) -> str:
         if page_text:
             text.append(page_text)
     return "\n".join(text)
+
+def extract_image_info(file_path: str) -> str:
+    """
+    Extrae información básica de una imagen: dimensiones, modo y base64 (primeros bytes).
+    No hace OCR ni análisis visual profundo.
+    """
+    try:
+        with open(file_path, "rb") as f:
+            img_bytes = f.read()
+        img = Image.open(io.BytesIO(img_bytes))
+        info = f"Imagen: {os.path.basename(file_path)}\nDimensiones: {img.width}x{img.height}\nModo: {img.mode}\n"
+        # Adjuntar una muestra base64 (limitada para no saturar el prompt)
+        b64 = base64.b64encode(img_bytes[:2048]).decode("utf-8")
+        info += f"Base64 (primeros 2KB): {b64}"
+        return info
+    except Exception as e:
+        return f"[ERROR] No se pudo procesar la imagen {file_path}: {e}"

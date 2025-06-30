@@ -24,17 +24,19 @@ async def generar_funcional_ia() -> str:
     """
     try:
         documentos = await get_documents()
-        if not documentos:
-            return "No hay documentos cargados para analizar."
-        # Usar solo el documento más reciente
-        doc = max(documentos, key=lambda d: d.fecha_carga)
+        # Solo considerar archivos de texto
+        extensiones_texto = {".txt", ".md", ".pdf", ".docx"}
+        documentos_texto = [doc for doc in documentos if os.path.splitext(doc.file_name)[1].lower() in extensiones_texto]
+        if not documentos_texto:
+            return "No hay documentos de texto válidos para analizar."
+        # Usar solo el documento de texto más reciente
+        doc = max(documentos_texto, key=lambda d: d.fecha_carga)
         texto = await extract_text_from_file(doc.file_path)
         if not texto or (isinstance(texto, str) and texto.strip() == ""):
             return f"No se pudo extraer texto del documento: {doc.file_name}"
         if isinstance(texto, str) and texto.strip().startswith("[ERROR]"):
             return texto  # Devuelve el mensaje de error detallado
         # Obtener el índice de la plantilla funcional
-        import os
         plantilla_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Documents", "Plantilla_Funcional.md"))
         indice = parse_template_tree(plantilla_path)
         # Construir el esquema de secciones en markdown

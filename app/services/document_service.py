@@ -11,7 +11,7 @@ from app.models.document import UploadedDocument
 from app.db.models import UploadedFile
 from app.db.session import AsyncSessionLocal
 from app.utils.parse_template import parse_template_sections
-from app.utils.file_text import extract_text_from_file, extract_text_from_pdf
+from app.utils.file_text import extract_text_from_file, extract_text_from_pdf, extract_image_info
 from app.services.document_store import get_documents
 from app.config import settings
 
@@ -59,14 +59,6 @@ async def generate_functional_document() -> Tuple[str, List[str], str]:
     Genera el documento funcional usando la plantilla y los documentos cargados en base de datos, llamando a Azure OpenAI.
     Returns:
         Tuple con (documento funcional generado, índice de secciones, prompt usado)
-    Pasos:
-        1. Lee los documentos subidos desde la base de datos.
-        2. Extrae el texto de cada documento (.txt, .md, .pdf, .docx).
-        3. Lee la plantilla funcional y extrae las secciones principales.
-        4. Construye un prompt para la IA con la plantilla y los textos de los documentos.
-        5. Llama a Azure OpenAI para generar el documento funcional.
-        6. La IA devuelve como resultado el documento funcional generado, en formato Markdown, siguiendo exactamente la estructura y secciones de la plantilla proporcionada.
-        7. El documento funcional generado debe mostrarse automáticamente en el panel "Análisis funcional (Markdown)" de la interfaz, permitiendo al usuario visualizar el contenido completo en ese panel.
     """
     docs = await get_documents()  # Siempre lee de la tabla UploadedFile
     documentos_entrada = []
@@ -78,21 +70,31 @@ async def generate_functional_document() -> Tuple[str, List[str], str]:
         else:
             archivos_sin_texto.append(doc.file_name)
     if not documentos_entrada:
-        raise RuntimeError(
-            "No se pudo extraer texto de los documentos cargados. Archivos problemáticos: " + ", ".join(archivos_sin_texto)
-            if archivos_sin_texto else "No hay documentos cargados en la base de datos o no se pudo extraer texto de los documentos."
-        )
+        raise Exception("No se pudo extraer texto ni información útil de los documentos subidos.")
     documentos_entrada_md = "\n\n".join(documentos_entrada)
-
-    # 2. Leer plantilla y extraer secciones
+    # Leer plantilla y extraer secciones
     template_path = "app/Documents/Plantilla_Funcional.md"
     sections = parse_template_sections(template_path)
     with open(template_path, encoding="utf-8") as f:
         plantilla_md = f.read()
-
-    # 3. Construir prompt para la IA (refinado)
+    # Prompt explícito para la IA: NO puede usar imágenes como contexto visual o referencia
     prompt = f"""
-Eres un analista funcional experto en software. A continuación tienes una plantilla de documento funcional y una serie de documentos de entrada (requisitos, especificaciones, etc). Analiza cuidadosamente el contenido de los documentos de entrada y genera un documento funcional completo siguiendo EXACTAMENTE la estructura y secciones de la plantilla (no añadas ni elimines secciones, solo rellena el contenido de cada una). El resultado debe estar en formato Markdown y debe ser lo más detallado y profesional posible.\n\nIMPORTANTE: Devuelve únicamente el documento funcional generado en Markdown, sin explicaciones adicionales, encabezados, ni comentarios fuera del documento.\n\n---\n\nPlantilla de documento funcional:\n{plantilla_md}\n\nDocumentos de entrada:\n{documentos_entrada_md}\n\n---\n\nGenera el documento funcional completo siguiendo la plantilla y usando toda la información relevante de los documentos de entrada.\n"""
+Eres un analista funcional experto en software. A continuación tienes una plantilla de documento funcional y una serie de documentos de entrada (pueden incluir archivos Word, PDF, TXT, MD y también imágenes). Analiza cuidadosamente el contenido de los documentos de entrada y genera un documento funcional completo siguiendo EXACTAMENTE la estructura y secciones de la plantilla (no añadas ni elimines secciones, solo rellena el contenido de cada una). El resultado debe estar en formato Markdown y debe ser lo más detallado y profesional posible.
+
+IMPORTANTE: NO puedes usar la información de imágenes (JPG, PNG, etc.) como contexto visual ni referencia. Ignora cualquier archivo que no sea texto. Devuelve únicamente el documento funcional generado en Markdown, sin explicaciones adicionales, encabezados, ni comentarios fuera del documento.
+
+---
+
+Plantilla de documento funcional:
+{plantilla_md}
+
+Documentos de entrada:
+{documentos_entrada_md}
+
+---
+
+Genera el documento funcional completo siguiendo la plantilla y usando toda la información relevante de los documentos de entrada.
+"""
 
     # 4. Llamar a Azure OpenAI (API REST)
     api_key = os.getenv("AZURE_OPENAI_API_KEY")

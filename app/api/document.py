@@ -18,6 +18,8 @@ import logging
 from app.utils.parse_template import parse_template_tree
 from app.utils.file_text import markdown_to_html
 import re
+from PIL import Image
+import io
 
 router = APIRouter(prefix="/api/document", tags=["document"])
 templates = Jinja2Templates(directory="templates")
@@ -39,10 +41,21 @@ async def upload_document(
     proyecto: str = Form("demo_metasketch"),
 ):
     """
-    Upload a document and return its metadata as HTML (for HTMX swap).
+    Upload a document or image and return its metadata as HTML (for HTMX swap).
     """
+    allowed_exts = {".pdf", ".docx", ".md", ".txt", ".jpg", ".jpeg", ".png"}
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in allowed_exts:
+        raise HTTPException(status_code=400, detail=f"Tipo de archivo no soportado: {ext}")
     try:
         file_bytes = await file.read()
+        # Si es imagen, validarla con Pillow
+        if ext in {".jpg", ".jpeg", ".png"}:
+            try:
+                img = Image.open(io.BytesIO(file_bytes))
+                img.verify()  # Verifica que sea una imagen válida
+            except Exception:
+                raise HTTPException(status_code=400, detail="La imagen está corrupta o no es válida.")
         doc = await save_uploaded_document(
             file_bytes=file_bytes,
             file_name=file.filename,
@@ -54,6 +67,8 @@ async def upload_document(
             "upload_result.html",
             {"request": request, "doc": doc}
         )
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -171,10 +186,11 @@ async def delete_document(request: Request, file_name: str):
         file = result.scalar_one_or_none()
         if file:
             try:
-                if os.path.exists(file.file_path):
+                # Elimina el archivo físico si existe
+                if file.file_path and os.path.exists(file.file_path):
                     os.remove(file.file_path)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(f"No se pudo eliminar el archivo físico: {file.file_path}. Error: {e}")
             await session.delete(file)
             await session.commit()
     docs = await get_documents()

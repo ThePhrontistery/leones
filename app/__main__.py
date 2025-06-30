@@ -47,6 +47,7 @@ async def root(request: Request, session: AsyncSession = Depends(get_async_sessi
 
 app.include_router(api_router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/uploaded_docs", StaticFiles(directory="uploaded_docs"), name="uploaded_docs")
 
 if __name__ == "__main__":             # `python -m app.main`
     import uvicorn

@@ -7,10 +7,16 @@
       <span class="text-[9px] text-slate-500 text-left w-full">{{ doc.categoria }} | {{ doc.fecha_carga }}</span>
       <span class="text-[9px] text-slate-400 text-left w-full">{{ doc.descripcion or '—' }}</span>
       <span class="text-[9px] text-slate-400 text-left w-full italic">Tipo: {{ doc.file_name.split('.')[-1]|upper }}</span>
+      {% set ext = doc.file_name.split('.')[-1].lower() %}
+      <div class="flex flex-row items-center gap-2 mt-1">
+        {% if ext in ["jpg", "jpeg", "png"] %}
+          <img src="/static/../{{ doc.file_path }}" alt="Miniatura" class="max-w-[80px] max-h-[60px] rounded shadow border border-slate-200" />
+        {% endif %}
+        <form hx-post="/api/document/delete/{{ doc.file_name }}" hx-target="#document-list" hx-swap="innerHTML" hx-trigger="click">
+          <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded text-[9px] font-semibold hover:bg-red-700 transition">Borrar</button>
+        </form>
+      </div>
     </div>
-    <form hx-post="/api/document/delete/{{ doc.file_name }}" hx-target="#document-list" hx-swap="innerHTML" hx-trigger="click" class="mt-2 flex justify-start w-full">
-      <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded text-[9px] font-semibold hover:bg-red-700 transition">Borrar</button>
-    </form>
   </li>
   {% endfor %}
 </ul>

@@ -21,6 +21,12 @@
           {{ title or "Metasketch" }}
         </h1>
         <nav class="flex items-center space-x-4">
+          <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank" rel="noopener" title="Abre una guía rápida de sintaxis Markdown en una nueva pestaña" class="px-3 py-2 rounded text-blue-700 hover:bg-blue-100 font-medium transition flex items-center">
+            Guía Markdown <span class="ml-1">📝</span>
+          </a>
+          <a href="https://dillinger.io/" target="_blank" rel="noopener" title="Abre un editor online para escribir y previsualizar Markdown en una nueva pestaña" class="px-3 py-2 rounded text-blue-700 hover:bg-blue-100 font-medium transition flex items-center">
+            Editor Markdown <span class="ml-1">🖊️</span>
+          </a>
           {% if user %}
           <span class="text-blue-800 font-semibold">Bienvenido, {{ user }} 👋</span>
           <a href="/logout" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 transition">Salir</a>

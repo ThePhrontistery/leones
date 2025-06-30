@@ -6,6 +6,7 @@
       <span class="font-semibold text-blue-800 text-[9px] break-all text-left w-full">{{ doc.file_name }}</span>
       <span class="text-[9px] text-slate-500 text-left w-full">{{ doc.categoria }} | {{ doc.fecha_carga }}</span>
       <span class="text-[9px] text-slate-400 text-left w-full">{{ doc.descripcion or '—' }}</span>
+      <span class="text-[9px] text-slate-400 text-left w-full italic">Tipo: {{ doc.file_name.split('.')[-1]|upper }}</span>
     </div>
     <form hx-post="/api/document/delete/{{ doc.file_name }}" hx-target="#document-list" hx-swap="innerHTML" hx-trigger="click" class="mt-2 flex justify-start w-full">
       <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded text-[9px] font-semibold hover:bg-red-700 transition">Borrar</button>

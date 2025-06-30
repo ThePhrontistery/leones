@@ -19,12 +19,14 @@ async def extract_text_from_file(file_path: str) -> Optional[str]:
             with open(file_path, "r", encoding="utf-8") as f:
                 return f.read()
         elif ext == ".pdf":
-            try:
-                import pdfplumber
-            except ImportError:
-                return "[ERROR] Falta pdfplumber para leer PDF."
-            with pdfplumber.open(file_path) as pdf:
-                return "\n".join(page.extract_text() or "" for page in pdf.pages)
+            # try:
+            #     import pdfplumber
+            # except ImportError:
+            #     return "[ERROR] Falta pdfplumber para leer PDF."
+            # with pdfplumber.open(file_path) as pdf:
+            #     return "\n".join(page.extract_text() or "" for page in pdf.pages)
+            from .file_text import extract_text_from_pdf
+            return extract_text_from_pdf(file_path)
         elif ext == ".docx":
             try:
                 import docx
@@ -58,14 +60,22 @@ def markdown_to_html(md: str) -> str:
 
 def extract_text_from_pdf(pdf_path: str) -> str:
     """
-    Extrae el texto de un archivo PDF usando pdfplumber.
+    Extrae el texto de un archivo PDF usando pypdf (puro Python).
     Devuelve el texto concatenado de todas las páginas.
     """
-    import pdfplumber
+    # import pdfplumber
+    # text = []
+    # with pdfplumber.open(pdf_path) as pdf:
+    #     for page in pdf.pages:
+    #         page_text = page.extract_text()
+    #         if page_text:
+    #             text.append(page_text)
+    # return "\n".join(text)
+    from pypdf import PdfReader
     text = []
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            page_text = page.extract_text()
-            if page_text:
-                text.append(page_text)
+    reader = PdfReader(pdf_path)
+    for page in reader.pages:
+        page_text = page.extract_text()
+        if page_text:
+            text.append(page_text)
     return "\n".join(text)

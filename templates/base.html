@@ -4,24 +4,34 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>{{ title or "Metasketch" }}</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', path='favicon.ico') }}">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="/static/document.js"></script>
+    <script src="/static/guardar_markdown.js"></script>
+    <script src="/static/exportar_markdown.js"></script>
   </head>
   <body class="bg-gradient-to-br from-slate-100 to-blue-100 min-h-screen w-screen">
     <div class="w-full h-screen flex flex-col">
-      <header class="mb-6 py-6 bg-white/80 shadow flex items-center justify-between px-8">
-        <h1 class="text-3xl font-bold text-blue-700 drop-shadow-sm">
+      <header class="mb-2 py-2 bg-white/80 shadow flex items-center justify-between px-6">
+        <h1 class="text-2xl font-bold text-blue-700 drop-shadow-sm">
           {{ title or "Metasketch" }}
         </h1>
-        {% if user %}
-        <div class="flex items-center space-x-4">
+        <nav class="flex items-center space-x-4">
+          <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank" rel="noopener" title="Abre una guía rápida de sintaxis Markdown en una nueva pestaña" class="px-3 py-2 rounded text-blue-700 hover:bg-blue-100 font-medium transition flex items-center">
+            Guía Markdown <span class="ml-1">📝</span>
+          </a>
+          <a href="https://dillinger.io/" target="_blank" rel="noopener" title="Abre un editor online para escribir y previsualizar Markdown en una nueva pestaña" class="px-3 py-2 rounded text-blue-700 hover:bg-blue-100 font-medium transition flex items-center">
+            Editor Markdown <span class="ml-1">🖊️</span>
+          </a>
+          {% if user %}
           <span class="text-blue-800 font-semibold">Bienvenido, {{ user }} 👋</span>
-          <a href="/logout" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 transition">Logout</a>
-        </div>
-        {% endif %}
+          <a href="/logout" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 transition">Salir</a>
+          {% endif %}
+        </nav>
       </header>
       <main class="flex-1 flex items-center justify-center">
         {% block content %}{% endblock %}

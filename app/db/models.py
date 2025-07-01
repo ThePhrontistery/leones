@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Text
 from sqlalchemy.ext.declarative import declarative_base
 import datetime
 
@@ -15,6 +15,13 @@ class UploadedFile(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     filename = Column(String, nullable=False)
-    content_type = Column(String, nullable=False)
+    file_path = Column(String, nullable=False)
+    categoria = Column(String, nullable=False)
+    descripcion = Column(String, nullable=True)
+    proyecto = Column(String, nullable=False, default="demo_metasketch")
     upload_time = Column(DateTime, default=datetime.datetime.utcnow)
-    # Puedes agregar más campos según necesidad (por ejemplo, usuario, tamaño, etc.)
+
+class MarkdownDocumentORM(Base):
+    __tablename__ = "markdown_documents"
+    id = Column(Integer, primary_key=True, index=True)
+    content = Column(Text, nullable=False)

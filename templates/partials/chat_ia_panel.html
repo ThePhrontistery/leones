@@ -1,0 +1,11 @@
+{% if respuesta %}
+  <div class="flex flex-col h-full">
+    <div class="flex-1 min-h-0 mb-2">
+      <div class="font-mono text-xs bg-slate-50 p-3 rounded border border-slate-200 text-green-900 overflow-y-auto min-h-[340px] max-h-[420px] whitespace-pre-line w-full">
+        {{ respuesta }}
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="text-gray-400 italic">No hay consulta aún.</div>
+{% endif %}

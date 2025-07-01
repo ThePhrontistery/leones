@@ -1,0 +1,25 @@
+<!-- Fragmento HTML para mostrar el documento funcional generado en el panel Markdown -->
+<div id="panel-funcional" class="w-full bg-white p-4 rounded shadow flex flex-col gap-6">
+  <div class="flex flex-row gap-4 w-full">
+    <!-- Editor Markdown editable -->
+    <div class="w-1/2 flex flex-col">
+      <div class="font-semibold text-blue-700 mb-2">Markdown</div>
+      <textarea id="markdown-editor-content" class="w-full h-72 bg-slate-50 rounded p-2 text-slate-800 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-200 overflow-y-auto resize-none" spellcheck="false">{{ resultado_md|default('', true) }}</textarea>
+      <div class="flex flex-row gap-2 mt-2">
+        <button id="guardar-markdown-btn" class="bg-blue-600 text-white px-4 py-1 text-xs rounded hover:bg-blue-700 transition min-w-[140px]">Guardar cambios</button>
+        <button id="exportar-markdown-btn" class="bg-green-600 text-white px-2 py-1 text-xs rounded hover:bg-green-700 transition">Exportar</button>
+        <select id="exportar-formato" class="px-1 py-1 rounded border border-slate-300 text-[10px] w-14 focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="word">Word</option>
+          <option value="pdf">PDF</option>
+        </select>
+        <div id="guardar-msg" class="ml-4 text-sm"></div>
+      </div>
+    </div>
+    <!-- Vista previa renderizada como HTML, mismo tamaño y scroll -->
+    <div class="w-1/2 flex flex-col">
+      <div class="font-semibold text-blue-700 mb-2">Vista previa</div>
+      <div id="markdown-preview" class="prose prose-slate w-full h-72 overflow-y-auto bg-slate-50 rounded p-2 border border-slate-200"></div>
+    </div>
+  </div>
+</div>
+<!-- El renderizado y guardado se gestiona por guardar_markdown.js -->

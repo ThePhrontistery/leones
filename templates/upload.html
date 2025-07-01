@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="w-full max-w-sm mx-auto mt-4 p-2">
+  <h2 class="text-lg font-bold text-blue-700 mb-2 text-center">Subir documento</h2>
+  <form id="upload-form" hx-post="/api/document/upload" hx-encoding="multipart/form-data" hx-target="#upload-result" hx-swap="innerHTML" class="flex flex-col gap-2 w-full">
+    <input type="file" name="file" accept=".pdf,.docx,.md,.txt,.jpg,.jpeg,.png" required class="block w-full text-xs text-slate-700 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+    <span class="text-[10px] text-slate-500">Formatos permitidos: PDF, Word (.docx), Markdown (.md), Texto (.txt), Imagen (.jpg, .jpeg, .png)</span>
+    <select name="categoria" required class="rounded border px-2 py-1 text-xs text-slate-700 bg-white">
+      <option value="" disabled selected hidden>Selecciona una categoría</option>
+      <option value="Grafico">Gráfico</option>
+      <option value="RFP">RFP</option>
+      <option value="General">General</option>
+      <option value="Otros">Otros</option>
+      <option value="Funcional">Funcional</option>
+      <option value="Técnico">Técnico</option>
+    </select>
+    <input type="text" name="descripcion" placeholder="Descripción breve" class="rounded border px-2 py-1 text-xs text-slate-700" />
+    <button type="submit" class="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800 transition text-xs">Cargar documento</button>
+  </form>
+  <div id="upload-result" class="mt-2 text-xs"></div>
+</div>
+<script>
+  document.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.target && evt.target.id === 'upload-result') {
+      if (window.opener) {
+        window.opener.document.body.dispatchEvent(new Event('documentUploaded'));
+        setTimeout(() => window.close(), 200);
+      }
+    }
+  });
+</script>
+{% endblock %}

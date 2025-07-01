@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="w-full max-w-xl mx-auto bg-white p-6 rounded shadow mt-8">
+  <h2 class="font-bold text-lg mb-4 text-blue-700">Chat IA (Agent) — Sugerencias de texto</h2>
+  <form id="chat-sugerencias-form" hx-post="/api/chat/sugerencias" hx-target="#sugerencias-list" hx-swap="innerHTML" class="flex flex-col gap-4">
+    <textarea name="prompt" required placeholder="Escribe tu pregunta o prompt..." class="border rounded p-2 w-full min-h-[60px] focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+    <input type="hidden" name="contexto" value="{{ contexto|default('') }}">
+    <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition">Obtener sugerencias</button>
+  </form>
+  <div id="sugerencias-list" class="mt-6">
+    <!-- Aquí se mostrarán las sugerencias -->
+  </div>
+  <div class="text-xs text-gray-400 mt-4">Puedes copiar manualmente cualquier sugerencia al editor del documento funcional.</div>
+</div>
+{% endblock %}
